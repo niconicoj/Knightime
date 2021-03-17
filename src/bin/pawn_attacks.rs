@@ -1,15 +1,13 @@
 extern crate nightime;
 
-use nightime::{attack::mask_pawn_attacks};
-use nightime::constants::*;
+use nightime::player::Player;
+use nightime::{constants::*, player::Side};
 
 fn main() {
-    let attacks = mask_pawn_attacks(Player::Black, A7);
-    println!("{}",attacks);
-    let attacks = mask_pawn_attacks(Player::Black, B7);
-    println!("{}",attacks);
-    let attacks = mask_pawn_attacks(Player::Black, H7);
-    println!("{}",attacks);
-    let attacks = mask_pawn_attacks(Player::Black, D1);
-    println!("{}",attacks);
+    let white = Player::new(Side::White);
+
+    for (index, pawn_attack) in white.get_pawn_attacks().iter().enumerate() {
+        println!("square index {}", index);
+        println!("{}", pawn_attack);
+    }
 }
