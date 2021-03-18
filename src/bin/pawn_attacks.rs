@@ -1,15 +1,12 @@
 extern crate nightime;
 
-use nightime::player::Player;
-use nightime::{constants::*, player::Side};
+use nightime::attack_tables::generate_bishop_attacks;
 
 fn main() {
-    let white = Player::new(Side::White);
+    let bishop_attacks = generate_bishop_attacks();
 
-    let king_attacks = white.get_king_attacks();
-
-    for (index, king_attack) in king_attacks.iter().enumerate() {
-        println!("square index : {}", index);
-        println!("{}", king_attack);
+    for (index, bishop_attack) in bishop_attacks.iter().enumerate() {
+        println!("square index {}", index);
+        println!("{}", bishop_attack);
     }
 }
