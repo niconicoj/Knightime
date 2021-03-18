@@ -9,6 +9,7 @@ pub enum Side {
 pub struct Player {
     side: Side,
     pawn_attacks: Vec<Bitboard>,
+    knight_attacks: Vec<Bitboard>,
 }
 
 impl Player {
@@ -16,6 +17,7 @@ impl Player {
         Self {
             side,
             pawn_attacks: Self::init_pawns_attacks(side),
+            knight_attacks: Self::init_knights_attacks(),
         }
     }
 
@@ -23,6 +25,14 @@ impl Player {
         let mut pawn_attacks: Vec<Bitboard> = vec![];
         for square in 0u64..64 {
             pawn_attacks.push(Self::mask_pawn_attacks(side, square));
+        }
+        pawn_attacks
+    }
+
+    fn init_knights_attacks() -> Vec<Bitboard> {
+        let mut pawn_attacks: Vec<Bitboard> = vec![];
+        for square in 0u64..64 {
+            pawn_attacks.push(Self::mask_knight_attacks(square));
         }
         pawn_attacks
     }
@@ -54,8 +64,32 @@ impl Player {
         return attacks;
     }
 
+    fn mask_knight_attacks(square: u64) -> Bitboard {
+
+        let mut attacks: Bitboard = Bitboard::default();
+        let mut bitboard: Bitboard = Bitboard::default();
+
+        bitboard.set_square(square);
+
+        if (bitboard & (H_FILE | RANK_78)) == 0 { attacks |= bitboard << 17 ;}
+        if (bitboard & (A_FILE | RANK_78)) == 0 { attacks |= bitboard << 15 ;}
+        if (bitboard & (HG_FILE | RANK_8)) == 0 { attacks |= bitboard << 10 ;}
+        if (bitboard & (AB_FILE | RANK_8)) == 0 { attacks |= bitboard << 6 ;}
+
+        if (bitboard & (A_FILE | RANK_12)) == 0 { attacks |= bitboard >> 17 ;}
+        if (bitboard & (H_FILE | RANK_12)) == 0 { attacks |= bitboard >> 15 ;}
+        if (bitboard & (AB_FILE | RANK_1)) == 0 { attacks |= bitboard >> 10 ;}
+        if (bitboard & (HG_FILE | RANK_1)) == 0 { attacks |= bitboard >> 6 ;}
+
+        return attacks;
+    }
+
     pub fn get_pawn_attacks(&self) -> Vec<Bitboard> {
         self.pawn_attacks.clone()
+    }
+
+    pub fn get_knight_attacks(&self) -> Vec<Bitboard> {
+        self.knight_attacks.clone()
     }
 
     pub fn get_side(&self) -> Side {
