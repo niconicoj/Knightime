@@ -65,21 +65,36 @@ impl Player {
     }
 
     fn mask_knight_attacks(square: u64) -> Bitboard {
-
         let mut attacks: Bitboard = Bitboard::default();
         let mut bitboard: Bitboard = Bitboard::default();
 
         bitboard.set_square(square);
 
-        if (bitboard & (H_FILE | RANK_78)) == 0 { attacks |= bitboard << 17 ;}
-        if (bitboard & (A_FILE | RANK_78)) == 0 { attacks |= bitboard << 15 ;}
-        if (bitboard & (HG_FILE | RANK_8)) == 0 { attacks |= bitboard << 10 ;}
-        if (bitboard & (AB_FILE | RANK_8)) == 0 { attacks |= bitboard << 6 ;}
+        if (bitboard & (H_FILE | RANK_78)) == 0 {
+            attacks |= bitboard << 17;
+        }
+        if (bitboard & (A_FILE | RANK_78)) == 0 {
+            attacks |= bitboard << 15;
+        }
+        if (bitboard & (HG_FILE | RANK_8)) == 0 {
+            attacks |= bitboard << 10;
+        }
+        if (bitboard & (AB_FILE | RANK_8)) == 0 {
+            attacks |= bitboard << 6;
+        }
 
-        if (bitboard & (A_FILE | RANK_12)) == 0 { attacks |= bitboard >> 17 ;}
-        if (bitboard & (H_FILE | RANK_12)) == 0 { attacks |= bitboard >> 15 ;}
-        if (bitboard & (AB_FILE | RANK_1)) == 0 { attacks |= bitboard >> 10 ;}
-        if (bitboard & (HG_FILE | RANK_1)) == 0 { attacks |= bitboard >> 6 ;}
+        if (bitboard & (A_FILE | RANK_12)) == 0 {
+            attacks |= bitboard >> 17;
+        }
+        if (bitboard & (H_FILE | RANK_12)) == 0 {
+            attacks |= bitboard >> 15;
+        }
+        if (bitboard & (AB_FILE | RANK_1)) == 0 {
+            attacks |= bitboard >> 10;
+        }
+        if (bitboard & (HG_FILE | RANK_1)) == 0 {
+            attacks |= bitboard >> 6;
+        }
 
         return attacks;
     }
