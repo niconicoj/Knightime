@@ -1,4 +1,7 @@
-use std::{fmt, ops::{BitAnd, BitOrAssign, Shl, Shr}};
+use std::{
+    fmt,
+    ops::{BitAnd, BitOr, BitOrAssign, Shl, Shr},
+};
 
 #[derive(PartialEq, PartialOrd, Clone, Copy, Debug)]
 pub struct Bitboard(u64);
@@ -14,17 +17,13 @@ impl fmt::Display for Bitboard {
         writeln!(f)?;
         for rank in (0u64..8u64).rev() {
             for file in 0u64..8u64 {
-                if file == 0  {
+                if file == 0 {
                     print!("{}   ", rank + 1);
                 }
                 let sq64 = rank * 8 + file;
                 match self.get_square(sq64) {
-                    true => {
-                        write!(f, "X ")?
-                    },
-                    false => {
-                        write!(f, "- ")?
-                    }
+                    true => write!(f, "X ")?,
+                    false => write!(f, "- ")?,
                 }
             }
             println!();
@@ -65,7 +64,15 @@ impl BitAnd<u64> for Bitboard {
 
 impl BitOrAssign<Bitboard> for Bitboard {
     fn bitor_assign(&mut self, rhs: Bitboard) {
-       self.0 |= rhs.0 
+        self.0 |= rhs.0
+    }
+}
+
+impl BitOr<Bitboard> for Bitboard {
+    type Output = Self;
+
+    fn bitor(self, rhs: Bitboard) -> Self::Output {
+        Bitboard::new(self.0 | rhs.0)
     }
 }
 
@@ -80,10 +87,16 @@ impl Bitboard {
         Self(value)
     }
 
+    pub fn from_square(square: u64) -> Self {
+        let mut bitboard = Self::default();
+        bitboard.set_square(square);
+        bitboard
+    }
+
     pub fn get_square(&self, index: u64) -> bool {
         match self.0 & (1u64 << index) {
             0 => return false,
-            _ => return true
+            _ => return true,
         }
     }
 
@@ -138,4 +151,3 @@ mod tests {
         assert_eq!(bitboard.0, 0x0);
     }
 }
-

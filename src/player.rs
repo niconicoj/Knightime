@@ -1,4 +1,4 @@
-use crate::{bitboard::Bitboard, constants::*};
+use crate::{bitboard::Bitboard, constants::*, mov::*};
 
 #[derive(Clone, Copy, Debug)]
 pub enum Side {
@@ -9,6 +9,7 @@ pub enum Side {
 pub struct Player {
     side: Side,
     pawn_attacks: Vec<Bitboard>,
+    king_attacks: Vec<Bitboard>,
     knight_attacks: Vec<Bitboard>,
 }
 
@@ -18,6 +19,7 @@ impl Player {
             side,
             pawn_attacks: Self::init_pawns_attacks(side),
             knight_attacks: Self::init_knights_attacks(),
+            king_attacks: Self::init_king_attacks(),
         }
     }
 
@@ -30,11 +32,19 @@ impl Player {
     }
 
     fn init_knights_attacks() -> Vec<Bitboard> {
-        let mut pawn_attacks: Vec<Bitboard> = vec![];
+        let mut knight_attacks: Vec<Bitboard> = vec![];
         for square in 0u64..64 {
-            pawn_attacks.push(Self::mask_knight_attacks(square));
+            knight_attacks.push(Self::mask_knight_attacks(square));
         }
-        pawn_attacks
+        knight_attacks
+    }
+
+    fn init_king_attacks() -> Vec<Bitboard> {
+        let mut king_attacks: Vec<Bitboard> = vec![];
+        for square in 0u64..64 {
+            king_attacks.push(Self::mask_king_attacks(square));
+        }
+        king_attacks
     }
 
     fn mask_pawn_attacks(side: Side, square: u64) -> Bitboard {
@@ -45,20 +55,10 @@ impl Player {
 
         match side {
             Side::White => {
-                if (bitboard & A_FILE) == 0 {
-                    attacks |= bitboard << 7;
-                }
-                if (bitboard & H_FILE) == 0 {
-                    attacks |= bitboard << 9;
-                }
+                attacks |= move_nw(bitboard) | move_ne(bitboard);
             }
             Side::Black => {
-                if (bitboard & H_FILE) == 0 {
-                    attacks |= bitboard >> 7;
-                }
-                if (bitboard & A_FILE) == 0 {
-                    attacks |= bitboard >> 9;
-                }
+                attacks |= move_sw(bitboard) | move_se(bitboard);
             }
         }
         return attacks;
@@ -70,31 +70,42 @@ impl Player {
 
         bitboard.set_square(square);
 
-        if (bitboard & (H_FILE | RANK_78)) == 0 {
+        if (bitboard & (FILE_H | RANK_78)) == 0 {
             attacks |= bitboard << 17;
         }
-        if (bitboard & (A_FILE | RANK_78)) == 0 {
+        if (bitboard & (FILE_A | RANK_78)) == 0 {
             attacks |= bitboard << 15;
         }
-        if (bitboard & (HG_FILE | RANK_8)) == 0 {
+        if (bitboard & (FILE_HG | RANK_8)) == 0 {
             attacks |= bitboard << 10;
         }
-        if (bitboard & (AB_FILE | RANK_8)) == 0 {
+        if (bitboard & (FILE_AB | RANK_8)) == 0 {
             attacks |= bitboard << 6;
         }
 
-        if (bitboard & (A_FILE | RANK_12)) == 0 {
+        if (bitboard & (FILE_A | RANK_12)) == 0 {
             attacks |= bitboard >> 17;
         }
-        if (bitboard & (H_FILE | RANK_12)) == 0 {
+        if (bitboard & (FILE_H | RANK_12)) == 0 {
             attacks |= bitboard >> 15;
         }
-        if (bitboard & (AB_FILE | RANK_1)) == 0 {
+        if (bitboard & (FILE_AB | RANK_1)) == 0 {
             attacks |= bitboard >> 10;
         }
-        if (bitboard & (HG_FILE | RANK_1)) == 0 {
+        if (bitboard & (FILE_HG | RANK_1)) == 0 {
             attacks |= bitboard >> 6;
         }
+
+        return attacks;
+    }
+
+    pub fn mask_king_attacks(square: u64) -> Bitboard {
+        let mut bitboard = Bitboard::default();
+        bitboard.set_square(square);
+
+        let mut attacks = move_e(bitboard) | move_w(bitboard);
+        bitboard |= attacks;
+        attacks |= move_n(bitboard) | move_s(bitboard);
 
         return attacks;
     }
@@ -105,6 +116,10 @@ impl Player {
 
     pub fn get_knight_attacks(&self) -> Vec<Bitboard> {
         self.knight_attacks.clone()
+    }
+
+    pub fn get_king_attacks(&self) -> Vec<Bitboard> {
+        self.king_attacks.clone()
     }
 
     pub fn get_side(&self) -> Side {
@@ -152,5 +167,29 @@ mod tests {
             Player::mask_pawn_attacks(Side::Black, D1),
             0x0000000000000000
         );
+    }
+
+    #[test]
+    fn mask_knight_attacks_tests() {
+        // general case
+        assert_eq!(Player::mask_knight_attacks(D4), 0x0000142200221400);
+        //check each corner moves
+        assert_eq!(Player::mask_knight_attacks(A1), 0x0000000000020400);
+        assert_eq!(Player::mask_knight_attacks(H1), 0x0000000000402000);
+        assert_eq!(Player::mask_knight_attacks(A8), 0x0004020000000000);
+        assert_eq!(Player::mask_knight_attacks(H8), 0x0020400000000000);
+        // check square on diagonals after the corners
+        assert_eq!(Player::mask_knight_attacks(B2), 0x0000000005080008);
+        assert_eq!(Player::mask_knight_attacks(G2), 0x00000000a0100010);
+        assert_eq!(Player::mask_knight_attacks(B7), 0x0800080500000000);
+        assert_eq!(Player::mask_knight_attacks(G7), 0x100010a000000000);
+    }
+
+    #[test]
+    fn mask_king_attacks_tests() {
+        // general case
+        assert_eq!(Player::mask_king_attacks(D4), 0x0000001c141c0000);
+        assert_eq!(Player::mask_king_attacks(H5), 0x0000c040c0000000);
+        assert_eq!(Player::mask_king_attacks(A8), 0x0203000000000000);
     }
 }

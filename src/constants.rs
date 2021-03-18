@@ -1,6 +1,6 @@
 pub enum Player {
     White,
-    Black
+    Black,
 }
 
 pub const A1: u64 = 0;
@@ -75,10 +75,10 @@ pub const H6: u64 = 47;
 pub const H7: u64 = 55;
 pub const H8: u64 = 63;
 
-pub const A_FILE: u64 = 0x0101010101010101;
-pub const AB_FILE: u64 = 0x0303030303030303;
-pub const H_FILE: u64 = 0x8080808080808080;
-pub const HG_FILE: u64 = 0xc0c0c0c0c0c0c0c0;
+pub const FILE_A: u64 = 0x0101010101010101;
+pub const FILE_AB: u64 = 0x0303030303030303;
+pub const FILE_H: u64 = 0x8080808080808080;
+pub const FILE_HG: u64 = 0xc0c0c0c0c0c0c0c0;
 
 pub const RANK_1: u64 = 0x00000000000000FF;
 pub const RANK_8: u64 = 0xFF00000000000000;
