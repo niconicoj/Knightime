@@ -1,12 +1,20 @@
 extern crate nightime;
 
-use nightime::attack_tables::generate_bishop_attacks;
+use nightime::{attack_tables::mask_rook_attacks, constants::*};
 
 fn main() {
-    let bishop_attacks = generate_bishop_attacks();
+    let rook_attacks = mask_rook_attacks(A4);
+    println!("{}", rook_attacks);
 
-    for (index, bishop_attack) in bishop_attacks.iter().enumerate() {
-        println!("square index {}", index);
-        println!("{}", bishop_attack);
-    }
+    let rook_attacks = mask_rook_attacks(D4);
+    println!("{}", rook_attacks);
+
+    let rook_attacks = mask_rook_attacks(A1);
+    println!("{}", rook_attacks);
+
+    let rook_attacks = mask_rook_attacks(H8);
+    println!("{}", rook_attacks);
+
+    let rook_attacks = mask_rook_attacks(H4);
+    println!("{}", rook_attacks);
 }

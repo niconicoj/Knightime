@@ -1,6 +1,6 @@
 use std::{
     fmt,
-    ops::{BitAnd, BitOr, BitOrAssign, Shl, Shr},
+    ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, Not, Shl, Shr},
 };
 
 #[derive(PartialEq, PartialOrd, Clone, Copy, Debug)]
@@ -62,6 +62,26 @@ impl BitAnd<u64> for Bitboard {
     }
 }
 
+impl BitAnd<Bitboard> for Bitboard {
+    type Output = Self;
+
+    fn bitand(self, rhs: Bitboard) -> Self::Output {
+        Self(self.0 & rhs.0)
+    }
+}
+
+impl BitAndAssign<u64> for Bitboard {
+    fn bitand_assign(&mut self, rhs: u64) {
+        self.0 &= rhs
+    }
+}
+
+impl BitAndAssign<Bitboard> for Bitboard {
+    fn bitand_assign(&mut self, rhs: Bitboard) {
+        self.0 &= rhs.0
+    }
+}
+
 impl BitOrAssign<Bitboard> for Bitboard {
     fn bitor_assign(&mut self, rhs: Bitboard) {
         self.0 |= rhs.0
@@ -79,6 +99,14 @@ impl BitOr<Bitboard> for Bitboard {
 impl PartialEq<u64> for Bitboard {
     fn eq(&self, other: &u64) -> bool {
         self.0 == *other
+    }
+}
+
+impl Not for Bitboard {
+    type Output = Self;
+
+    fn not(self) -> Self::Output {
+        Self(!self.0)
     }
 }
 
