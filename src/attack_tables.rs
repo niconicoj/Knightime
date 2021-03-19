@@ -1,28 +1,27 @@
 use crate::{bitboard::Bitboard, constants::*};
 
 pub fn mask_bishop_attacks(square: u64) -> Bitboard {
-    let mut attacks = Bitboard::default();
+    let mut bitboard = Bitboard::default();
 
-    let target_rank = square / 8;
-    let target_file = square % 8;
+    bitboard.set_square(square);
 
-    for (rank, file) in ((target_rank + 1)..7).zip((target_file + 1)..7) {
-        attacks.set_square(rank * 8 + file);
-    }
+    let target_rank: i32 = (square / 8) as i32;
+    let target_file: i32 = (square % 8) as i32;
 
-    for (rank, file) in (1..target_rank).rev().zip((target_file + 1)..7) {
-        attacks.set_square(rank * 8 + file);
-    }
+    let offset_ah: i32 = target_file - target_rank;
+    let offset_ha: i32 = target_file - (8 - target_rank) + 1;
 
-    for (rank, file) in ((target_rank + 1)..7).zip((1..target_file).rev()) {
-        attacks.set_square(rank * 8 + file);
-    }
+    let mut attacks = match offset_ah.cmp(&0i32) {
+        std::cmp::Ordering::Less => Bitboard::new(DIAGONAL_AH << offset_ah.abs() * 8),
+        _ => Bitboard::new(DIAGONAL_AH >> offset_ah * 8),
+    };
 
-    for (rank, file) in (1..target_rank).rev().zip((1..target_file).rev()) {
-        attacks.set_square(rank * 8 + file);
-    }
+    match offset_ha.cmp(&0i32) {
+        std::cmp::Ordering::Less => attacks |= DIAGONAL_HA >> offset_ha.abs() * 8,
+        _ => attacks |= DIAGONAL_HA << offset_ha * 8,
+    };
 
-    return attacks;
+    return attacks & !bitboard & !FILE_A & !FILE_H & !RANK_1 & !RANK_8;
 }
 
 pub fn generate_bishop_attacks() -> Vec<Bitboard> {
