@@ -3,6 +3,8 @@ use std::{
     ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, Not, Shl, Shr},
 };
 
+use crate::defs::Square;
+
 #[derive(PartialEq, PartialOrd, Clone, Copy, Debug)]
 pub struct Bitboard(u64);
 
@@ -20,7 +22,7 @@ impl fmt::Display for Bitboard {
                 if file == 0 {
                     print!("{}   ", rank + 1);
                 }
-                let square = (rank * 8 + file) as u8;
+                let square = (rank * 8 + file) as Square;
                 match self.get_square(square) {
                     true => write!(f, "X ")?,
                     false => write!(f, "- ")?,
@@ -54,18 +56,18 @@ impl Shr<u64> for Bitboard {
     }
 }
 
-impl Shl<u8> for Bitboard {
+impl Shl<Square> for Bitboard {
     type Output = Self;
 
-    fn shl(self, rhs: u8) -> Self::Output {
+    fn shl(self, rhs: Square) -> Self::Output {
         Self(self.0 << rhs)
     }
 }
 
-impl Shr<u8> for Bitboard {
+impl Shr<Square> for Bitboard {
     type Output = Self;
 
-    fn shr(self, rhs: u8) -> Self::Output {
+    fn shr(self, rhs: Square) -> Self::Output {
         Self(self.0 >> rhs)
     }
 }
@@ -137,25 +139,37 @@ impl Bitboard {
         Self(value)
     }
 
-    pub fn from_square(square: u8) -> Self {
+    pub fn from_square(square: Square) -> Self {
         let mut bitboard = Self::default();
         bitboard.set_square(square);
         bitboard
     }
 
-    pub fn get_square(&self, square: u8) -> bool {
+    pub fn get_square(&self, square: Square) -> bool {
         match self.0 & (1u64 << square) {
             0 => return false,
             _ => return true,
         }
     }
 
-    pub fn set_square(&mut self, square: u8) {
+    pub fn set_square(&mut self, square: Square) {
         self.0 |= 1 << square;
     }
 
-    pub fn clear_square(&mut self, square: u8) {
+    pub fn clear_square(&mut self, square: Square) {
         self.0 &= !(1 << square);
+    }
+
+    pub fn count_occupied_squares(&self) -> u32 {
+        self.0.count_ones()
+    }
+
+    pub fn get_ls1b_index(&self) -> u32 {
+        let count = self.0.trailing_zeros();
+        return match count >= 64 {
+            true => 0,
+            false => count,
+        };
     }
 }
 

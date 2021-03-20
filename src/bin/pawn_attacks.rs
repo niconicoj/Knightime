@@ -1,12 +1,14 @@
 extern crate nightime;
 
-use nightime::{attack_tables::generate_rook_attacks_otf, bitboard::Bitboard, constants::*};
+use nightime::{
+    attack_tables::{generate_rook_attacks_otf, mask_rook_attacks, set_occupancy},
+    bitboard::Bitboard,
+    constants::*,
+};
 
 fn main() {
-    let bitboard = generate_rook_attacks_otf(G5, Bitboard::default());
-    println!("{}", bitboard);
-    let bitboard = generate_rook_attacks_otf(D4, Bitboard::new(0x0008000012000800));
-    println!("{}", bitboard);
-    let bitboard = generate_rook_attacks_otf(A1, Bitboard::default());
-    println!("{}", bitboard);
+    let mut rook_attack_mask = mask_rook_attacks(A1);
+
+    let occupancy = set_occupancy(2048, &mut rook_attack_mask);
+    println!("{}", occupancy);
 }

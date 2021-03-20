@@ -1,6 +1,6 @@
-use crate::{bitboard::Bitboard, constants::*};
+use crate::{bitboard::Bitboard, constants::*, defs::Square};
 
-pub fn mask_bishop_attacks(square: u8) -> Bitboard {
+pub fn mask_bishop_attacks(square: Square) -> Bitboard {
     let mut bitboard = Bitboard::default();
 
     bitboard.set_square(square);
@@ -24,11 +24,11 @@ pub fn mask_bishop_attacks(square: u8) -> Bitboard {
     return attacks & !bitboard & !FILE_A & !FILE_H & !RANK_1 & !RANK_8;
 }
 
-pub fn generate_bishop_attacks_otf(square: u8, blockers: Bitboard) -> Bitboard {
+pub fn generate_bishop_attacks_otf(square: Square, blockers: Bitboard) -> Bitboard {
     let mut attacks = Bitboard::default();
 
-    let target_rank: u8 = square / 8;
-    let target_file: u8 = square % 8;
+    let target_rank: u32 = square / 8;
+    let target_file: u32 = square % 8;
 
     for (rank, file) in ((target_rank + 1)..8).zip((target_file + 1)..8) {
         attacks.set_square(rank * 8 + file);
@@ -64,13 +64,13 @@ pub fn generate_bishop_attacks_otf(square: u8, blockers: Bitboard) -> Bitboard {
 pub fn generate_bishop_attacks() -> Vec<Bitboard> {
     let mut bishop_attacks = vec![];
 
-    for square in 0u8..64 {
+    for square in 0..64 {
         bishop_attacks.push(mask_bishop_attacks(square));
     }
     bishop_attacks
 }
 
-pub fn mask_rook_attacks(square: u8) -> Bitboard {
+pub fn mask_rook_attacks(square: Square) -> Bitboard {
     let mut bitboard = Bitboard::default();
 
     bitboard.set_square(square);
@@ -98,7 +98,7 @@ pub fn generate_rook_attacks() -> Vec<Bitboard> {
     rook_attacks
 }
 
-pub fn generate_rook_attacks_otf(square: u8, blockers: Bitboard) -> Bitboard {
+pub fn generate_rook_attacks_otf(square: Square, blockers: Bitboard) -> Bitboard {
     let mut attacks = Bitboard::default();
 
     let target_rank = square / 8;
@@ -133,6 +133,21 @@ pub fn generate_rook_attacks_otf(square: u8, blockers: Bitboard) -> Bitboard {
     }
 
     attacks
+}
+
+pub fn set_occupancy(index: u64, attack_mask: &mut Bitboard) -> Bitboard {
+    let mut occupancy = Bitboard::default();
+
+    let bit_count = attack_mask.count_occupied_squares();
+
+    for count in 0..bit_count {
+        let square = attack_mask.get_ls1b_index();
+        attack_mask.clear_square(square);
+        if (index & (1u64 << count)) != 0 {
+            occupancy |= 1 << square;
+        }
+    }
+    occupancy
 }
 
 #[cfg(test)]

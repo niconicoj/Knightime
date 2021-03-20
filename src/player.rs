@@ -1,4 +1,4 @@
-use crate::{bitboard::Bitboard, constants::*, mov::*};
+use crate::{bitboard::Bitboard, constants::*, defs::Square, mov::*};
 
 #[derive(Clone, Copy, Debug)]
 pub enum Side {
@@ -47,7 +47,7 @@ impl Player {
         king_attacks
     }
 
-    fn mask_pawn_attacks(side: Side, square: u8) -> Bitboard {
+    fn mask_pawn_attacks(side: Side, square: Square) -> Bitboard {
         let mut attacks: Bitboard = Bitboard::default();
         let mut bitboard: Bitboard = Bitboard::default();
 
@@ -64,42 +64,42 @@ impl Player {
         return attacks;
     }
 
-    fn mask_knight_attacks(square: u8) -> Bitboard {
+    fn mask_knight_attacks(square: Square) -> Bitboard {
         let mut attacks: Bitboard = Bitboard::default();
         let mut bitboard: Bitboard = Bitboard::default();
 
         bitboard.set_square(square);
 
         if (bitboard & (FILE_H | RANK_78)) == 0 {
-            attacks |= bitboard << 17u8;
+            attacks |= bitboard << 17u32;
         }
         if (bitboard & (FILE_A | RANK_78)) == 0 {
-            attacks |= bitboard << 15u8;
+            attacks |= bitboard << 15u32;
         }
         if (bitboard & (FILE_HG | RANK_8)) == 0 {
-            attacks |= bitboard << 10u8;
+            attacks |= bitboard << 10u32;
         }
         if (bitboard & (FILE_AB | RANK_8)) == 0 {
-            attacks |= bitboard << 6u8;
+            attacks |= bitboard << 6u32;
         }
 
         if (bitboard & (FILE_A | RANK_12)) == 0 {
-            attacks |= bitboard >> 17u8;
+            attacks |= bitboard >> 17u32;
         }
         if (bitboard & (FILE_H | RANK_12)) == 0 {
-            attacks |= bitboard >> 15u8;
+            attacks |= bitboard >> 15u32;
         }
         if (bitboard & (FILE_AB | RANK_1)) == 0 {
-            attacks |= bitboard >> 10u8;
+            attacks |= bitboard >> 10u32;
         }
         if (bitboard & (FILE_HG | RANK_1)) == 0 {
-            attacks |= bitboard >> 6u8;
+            attacks |= bitboard >> 6u32;
         }
 
         return attacks;
     }
 
-    pub fn mask_king_attacks(square: u8) -> Bitboard {
+    pub fn mask_king_attacks(square: Square) -> Bitboard {
         let mut bitboard = Bitboard::default();
         bitboard.set_square(square);
 
