@@ -1,6 +1,6 @@
 use crate::{bitboard::Bitboard, constants::*};
 
-pub fn mask_bishop_attacks(square: u64) -> Bitboard {
+pub fn mask_bishop_attacks(square: u8) -> Bitboard {
     let mut bitboard = Bitboard::default();
 
     bitboard.set_square(square);
@@ -27,13 +27,13 @@ pub fn mask_bishop_attacks(square: u64) -> Bitboard {
 pub fn generate_bishop_attacks() -> Vec<Bitboard> {
     let mut bishop_attacks = vec![];
 
-    for square in 0u64..64 {
+    for square in 0u8..64 {
         bishop_attacks.push(mask_bishop_attacks(square));
     }
     bishop_attacks
 }
 
-pub fn mask_rook_attacks(square: u64) -> Bitboard {
+pub fn mask_rook_attacks(square: u8) -> Bitboard {
     let mut bitboard = Bitboard::default();
 
     bitboard.set_square(square);
@@ -55,7 +55,7 @@ pub fn mask_rook_attacks(square: u64) -> Bitboard {
 pub fn generate_rook_attacks() -> Vec<Bitboard> {
     let mut rook_attacks = vec![];
 
-    for square in 0u64..64 {
+    for square in 0..64 {
         rook_attacks.push(mask_rook_attacks(square));
     }
     rook_attacks

@@ -20,8 +20,8 @@ impl fmt::Display for Bitboard {
                 if file == 0 {
                     print!("{}   ", rank + 1);
                 }
-                let sq64 = rank * 8 + file;
-                match self.get_square(sq64) {
+                let square = (rank * 8 + file) as u8;
+                match self.get_square(square) {
                     true => write!(f, "X ")?,
                     false => write!(f, "- ")?,
                 }
@@ -50,6 +50,22 @@ impl Shr<u64> for Bitboard {
     type Output = Self;
 
     fn shr(self, rhs: u64) -> Self::Output {
+        Self(self.0 >> rhs)
+    }
+}
+
+impl Shl<u8> for Bitboard {
+    type Output = Self;
+
+    fn shl(self, rhs: u8) -> Self::Output {
+        Self(self.0 << rhs)
+    }
+}
+
+impl Shr<u8> for Bitboard {
+    type Output = Self;
+
+    fn shr(self, rhs: u8) -> Self::Output {
         Self(self.0 >> rhs)
     }
 }
@@ -121,25 +137,25 @@ impl Bitboard {
         Self(value)
     }
 
-    pub fn from_square(square: u64) -> Self {
+    pub fn from_square(square: u8) -> Self {
         let mut bitboard = Self::default();
         bitboard.set_square(square);
         bitboard
     }
 
-    pub fn get_square(&self, index: u64) -> bool {
-        match self.0 & (1u64 << index) {
+    pub fn get_square(&self, square: u8) -> bool {
+        match self.0 & (1u64 << square) {
             0 => return false,
             _ => return true,
         }
     }
 
-    pub fn set_square(&mut self, index: u64) {
-        self.0 |= 1 << index;
+    pub fn set_square(&mut self, square: u8) {
+        self.0 |= 1 << square;
     }
 
-    pub fn clear_square(&mut self, index: u64) {
-        self.0 &= !(1 << index);
+    pub fn clear_square(&mut self, square: u8) {
+        self.0 &= !(1 << square);
     }
 }
 
@@ -151,7 +167,7 @@ mod tests {
     #[test]
     fn get_square_tests() {
         let bitboard = Bitboard::default();
-        for index in 0u64..64 {
+        for index in 0..64 {
             assert_eq!(bitboard.get_square(index), false);
         }
 

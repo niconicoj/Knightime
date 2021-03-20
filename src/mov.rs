@@ -1,35 +1,35 @@
 use crate::{bitboard::Bitboard, constants::*};
 
 pub fn move_n(bitboard: Bitboard) -> Bitboard {
-    bitboard << 8
+    bitboard << 8u8
 }
 
 pub fn move_s(bitboard: Bitboard) -> Bitboard {
-    bitboard >> 8
+    bitboard >> 8u8
 }
 
 pub fn move_e(bitboard: Bitboard) -> Bitboard {
-    (bitboard & !FILE_H) << 1
+    (bitboard & !FILE_H) << 1u8
 }
 
 pub fn move_ne(bitboard: Bitboard) -> Bitboard {
-    (bitboard & !FILE_H) << 9
+    (bitboard & !FILE_H) << 9u8
 }
 
 pub fn move_se(bitboard: Bitboard) -> Bitboard {
-    (bitboard & !FILE_H) >> 7
+    (bitboard & !FILE_H) >> 7u8
 }
 
 pub fn move_w(bitboard: Bitboard) -> Bitboard {
-    (bitboard & !FILE_A) >> 1
+    (bitboard & !FILE_A) >> 1u8
 }
 
 pub fn move_nw(bitboard: Bitboard) -> Bitboard {
-    (bitboard & !FILE_A) << 7
+    (bitboard & !FILE_A) << 7u8
 }
 
 pub fn move_sw(bitboard: Bitboard) -> Bitboard {
-    (bitboard & !FILE_A) >> 9
+    (bitboard & !FILE_A) >> 9u8
 }
 
 #[cfg(test)]

@@ -25,7 +25,7 @@ impl Player {
 
     fn init_pawns_attacks(side: Side) -> Vec<Bitboard> {
         let mut pawn_attacks: Vec<Bitboard> = vec![];
-        for square in 0u64..64 {
+        for square in 0..64 {
             pawn_attacks.push(Self::mask_pawn_attacks(side, square));
         }
         pawn_attacks
@@ -33,7 +33,7 @@ impl Player {
 
     fn init_knights_attacks() -> Vec<Bitboard> {
         let mut knight_attacks: Vec<Bitboard> = vec![];
-        for square in 0u64..64 {
+        for square in 0..64 {
             knight_attacks.push(Self::mask_knight_attacks(square));
         }
         knight_attacks
@@ -41,13 +41,13 @@ impl Player {
 
     fn init_king_attacks() -> Vec<Bitboard> {
         let mut king_attacks: Vec<Bitboard> = vec![];
-        for square in 0u64..64 {
+        for square in 0..64 {
             king_attacks.push(Self::mask_king_attacks(square));
         }
         king_attacks
     }
 
-    fn mask_pawn_attacks(side: Side, square: u64) -> Bitboard {
+    fn mask_pawn_attacks(side: Side, square: u8) -> Bitboard {
         let mut attacks: Bitboard = Bitboard::default();
         let mut bitboard: Bitboard = Bitboard::default();
 
@@ -64,42 +64,42 @@ impl Player {
         return attacks;
     }
 
-    fn mask_knight_attacks(square: u64) -> Bitboard {
+    fn mask_knight_attacks(square: u8) -> Bitboard {
         let mut attacks: Bitboard = Bitboard::default();
         let mut bitboard: Bitboard = Bitboard::default();
 
         bitboard.set_square(square);
 
         if (bitboard & (FILE_H | RANK_78)) == 0 {
-            attacks |= bitboard << 17;
+            attacks |= bitboard << 17u8;
         }
         if (bitboard & (FILE_A | RANK_78)) == 0 {
-            attacks |= bitboard << 15;
+            attacks |= bitboard << 15u8;
         }
         if (bitboard & (FILE_HG | RANK_8)) == 0 {
-            attacks |= bitboard << 10;
+            attacks |= bitboard << 10u8;
         }
         if (bitboard & (FILE_AB | RANK_8)) == 0 {
-            attacks |= bitboard << 6;
+            attacks |= bitboard << 6u8;
         }
 
         if (bitboard & (FILE_A | RANK_12)) == 0 {
-            attacks |= bitboard >> 17;
+            attacks |= bitboard >> 17u8;
         }
         if (bitboard & (FILE_H | RANK_12)) == 0 {
-            attacks |= bitboard >> 15;
+            attacks |= bitboard >> 15u8;
         }
         if (bitboard & (FILE_AB | RANK_1)) == 0 {
-            attacks |= bitboard >> 10;
+            attacks |= bitboard >> 10u8;
         }
         if (bitboard & (FILE_HG | RANK_1)) == 0 {
-            attacks |= bitboard >> 6;
+            attacks |= bitboard >> 6u8;
         }
 
         return attacks;
     }
 
-    pub fn mask_king_attacks(square: u64) -> Bitboard {
+    pub fn mask_king_attacks(square: u8) -> Bitboard {
         let mut bitboard = Bitboard::default();
         bitboard.set_square(square);
 
