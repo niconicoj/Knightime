@@ -37,35 +37,55 @@ mod tests {
     use super::*;
 
     #[test]
-    fn one_step_moves_tests() {
-        // North
+    fn move_north_tests() {
         assert_eq!(move_n(Bitboard::from_square(A1)), 0x0000000000000100);
         assert_eq!(move_n(Bitboard::from_square(A8)), 0x0000000000000000);
-        // South
-        assert_eq!(move_s(Bitboard::from_square(A1)), 0x0000000000000000);
-        assert_eq!(move_s(Bitboard::from_square(A8)), 0x0001000000000000);
-        // East
+    }
+
+    #[test]
+    fn move_east_tests() {
         assert_eq!(move_e(Bitboard::from_square(A8)), 0x0200000000000000);
         assert_eq!(move_e(Bitboard::from_square(H1)), 0x0000000000000000);
-        // West
+    }
+
+    #[test]
+    fn move_south_tests() {
+        assert_eq!(move_s(Bitboard::from_square(A1)), 0x0000000000000000);
+        assert_eq!(move_s(Bitboard::from_square(A8)), 0x0001000000000000);
+    }
+
+    #[test]
+    fn move_west_tests() {
         assert_eq!(move_w(Bitboard::from_square(H1)), 0x0000000000000040);
         assert_eq!(move_w(Bitboard::from_square(A1)), 0x0000000000000000);
-        // North-East
+    }
+
+    #[test]
+    fn move_north_east_tests() {
         assert_eq!(move_ne(Bitboard::from_square(A1)), 0x0000000000000200);
         assert_eq!(move_ne(Bitboard::from_square(H1)), 0x0000000000000000);
         assert_eq!(move_ne(Bitboard::from_square(A8)), 0x0000000000000000);
         assert_eq!(move_ne(Bitboard::from_square(H8)), 0x0000000000000000);
-        // North-West
+    }
+
+    #[test]
+    fn move_north_west_tests() {
         assert_eq!(move_nw(Bitboard::from_square(A1)), 0x0000000000000000);
         assert_eq!(move_nw(Bitboard::from_square(H1)), 0x0000000000004000);
         assert_eq!(move_nw(Bitboard::from_square(A8)), 0x0000000000000000);
         assert_eq!(move_nw(Bitboard::from_square(H8)), 0x0000000000000000);
-        // South-East
+    }
+
+    #[test]
+    fn move_south_east_tests() {
         assert_eq!(move_se(Bitboard::from_square(A1)), 0x0000000000000000);
         assert_eq!(move_se(Bitboard::from_square(H1)), 0x0000000000000000);
         assert_eq!(move_se(Bitboard::from_square(A8)), 0x0002000000000000);
         assert_eq!(move_se(Bitboard::from_square(H8)), 0x0000000000000000);
-        // South-West
+    }
+
+    #[test]
+    fn move_south_west_tests() {
         assert_eq!(move_sw(Bitboard::from_square(A1)), 0x0000000000000000);
         assert_eq!(move_sw(Bitboard::from_square(H1)), 0x0000000000000000);
         assert_eq!(move_sw(Bitboard::from_square(A8)), 0x0000000000000000);
