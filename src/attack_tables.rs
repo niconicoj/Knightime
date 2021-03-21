@@ -135,7 +135,7 @@ pub fn generate_rook_attacks_otf(square: Square, blockers: Bitboard) -> Bitboard
     attacks
 }
 
-pub fn set_occupancy(index: u64, attack_mask: &mut Bitboard) -> Bitboard {
+pub fn set_occupancy(index: u64, mut attack_mask: Bitboard) -> Bitboard {
     let mut occupancy = Bitboard::default();
 
     let bit_count = attack_mask.count_occupied_squares();

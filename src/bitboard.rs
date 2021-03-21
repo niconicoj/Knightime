@@ -1,6 +1,6 @@
 use std::{
     fmt,
-    ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, Not, Shl, Shr},
+    ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, Mul, Not, Shl, Shr},
 };
 
 use crate::defs::Square;
@@ -134,9 +134,21 @@ impl Not for Bitboard {
     }
 }
 
+impl Mul<u64> for Bitboard {
+    type Output = Self;
+
+    fn mul(self, rhs: u64) -> Self::Output {
+        Self(self.0 * rhs)
+    }
+}
+
 impl Bitboard {
     pub fn new(value: u64) -> Self {
         Self(value)
+    }
+
+    pub fn get_value(&self) -> u64 {
+        self.0
     }
 
     pub fn from_square(square: Square) -> Self {

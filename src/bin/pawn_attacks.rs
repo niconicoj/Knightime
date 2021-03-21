@@ -1,14 +1,12 @@
 extern crate nightime;
 
-use nightime::{
-    attack_tables::{generate_rook_attacks_otf, mask_rook_attacks, set_occupancy},
-    bitboard::Bitboard,
-    constants::*,
-};
+use nightime::{constants::ROOK_RELEVANT_BITS, defs::Piece, misc::find_magic};
 
 fn main() {
-    let mut rook_attack_mask = mask_rook_attacks(A1);
-
-    let occupancy = set_occupancy(2048, &mut rook_attack_mask);
-    println!("{}", occupancy);
+    for square in 0..64 {
+        match find_magic(square, ROOK_RELEVANT_BITS[square as usize], Piece::Rook) {
+            Some(magic) => println!("square {} magic : {}", square, magic),
+            None => println!("square {} no magic found", square),
+        }
+    }
 }
