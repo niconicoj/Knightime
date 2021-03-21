@@ -1,6 +1,7 @@
 use crate::defs::Square;
 
-pub enum Player {
+#[derive(Copy, Clone, PartialEq)]
+pub enum Side {
     White,
     Black,
 }
