@@ -65,6 +65,49 @@ impl MoveGenerator {
 
         return attacks;
     }
+
+    pub fn mask_rook_attacks(square: Square) -> Bitboard {
+        let mut bitboard = Bitboard::default();
+
+        bitboard.set_square(square);
+
+        let target_rank = square / 8;
+        let target_file = square % 8;
+
+        let mut attacks = Bitboard::new((FILE_A << target_file) | (RANK_1 << target_rank * 8));
+
+        attacks &= !bitboard
+            & !(bitboard >> target_file)
+            & !(bitboard << (7 - target_file))
+            & !(bitboard >> (target_rank * 8))
+            & !(bitboard << ((7 - target_rank) * 8));
+
+        attacks
+    }
+
+    pub fn mask_bishop_attacks(square: Square) -> Bitboard {
+        let mut bitboard = Bitboard::default();
+
+        bitboard.set_square(square);
+
+        let target_rank: i32 = (square / 8) as i32;
+        let target_file: i32 = (square % 8) as i32;
+
+        let offset_ah: i32 = target_file - target_rank;
+        let offset_ha: i32 = target_file - (8 - target_rank) + 1;
+
+        let mut attacks = match offset_ah.cmp(&0i32) {
+            std::cmp::Ordering::Less => Bitboard::new(DIAGONAL_AH << offset_ah.abs() * 8),
+            _ => Bitboard::new(DIAGONAL_AH >> offset_ah * 8),
+        };
+
+        match offset_ha.cmp(&0i32) {
+            std::cmp::Ordering::Less => attacks |= DIAGONAL_HA >> offset_ha.abs() * 8,
+            _ => attacks |= DIAGONAL_HA << offset_ha * 8,
+        };
+
+        return attacks & !bitboard & !FILE_A & !FILE_H & !RANK_1 & !RANK_8;
+    }
 }
 
 #[cfg(test)]
@@ -131,5 +174,22 @@ mod tests {
         assert_eq!(MoveGenerator::mask_king_attacks(D4), 0x0000001c141c0000);
         assert_eq!(MoveGenerator::mask_king_attacks(H5), 0x0000c040c0000000);
         assert_eq!(MoveGenerator::mask_king_attacks(A8), 0x0203000000000000);
+    }
+
+    #[test]
+    fn mask_bishop_attacks_tests() {
+        assert_eq!(MoveGenerator::mask_bishop_attacks(A1), 0x0040201008040200);
+        assert_eq!(MoveGenerator::mask_bishop_attacks(D4), 0x0040221400142200);
+        assert_eq!(MoveGenerator::mask_bishop_attacks(B3), 0x0020100804000400);
+        assert_eq!(MoveGenerator::mask_bishop_attacks(G5), 0x0010200020100800);
+    }
+
+    #[test]
+    fn mask_rook_attacks_tests() {
+        assert_eq!(MoveGenerator::mask_rook_attacks(A4), 0x000101017e010100);
+        assert_eq!(MoveGenerator::mask_rook_attacks(D4), 0x0008080876080800);
+        assert_eq!(MoveGenerator::mask_rook_attacks(A1), 0x000101010101017e);
+        assert_eq!(MoveGenerator::mask_rook_attacks(H8), 0x7e80808080808000);
+        assert_eq!(MoveGenerator::mask_rook_attacks(H4), 0x008080807e808000);
     }
 }

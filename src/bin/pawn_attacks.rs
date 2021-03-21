@@ -1,6 +1,6 @@
 extern crate nightime;
 
-use nightime::{constants::*, move_generator::MoveGenerator};
+use nightime::{bitboard::Bitboard, constants::*, move_generator::MoveGenerator};
 
 fn main() {
     let movegen = MoveGenerator::new();
@@ -15,5 +15,10 @@ fn main() {
     println!("{}", black_pawn_attack);
 
     let knight_attack = movegen.get_knight_attacks(G4);
+
     println!("{}", knight_attack);
+
+    let rook_attack = movegen.get_rook_attacks(C5, Bitboard::new(0x0000a0100010a000));
+
+    println!("{}", rook_attack);
 }

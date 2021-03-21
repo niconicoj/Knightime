@@ -1,10 +1,8 @@
 use crate::{
-    attack_tables::{
-        generate_bishop_attack_boards, generate_rook_attack_boards, mask_bishop_attacks,
-        mask_rook_attacks,
-    },
     bitboard::Bitboard,
+    constants::SQUARE_NAME,
     defs::{Piece, Square},
+    move_generator::MoveGenerator,
 };
 
 use rand::{Rng, SeedableRng};
@@ -171,8 +169,8 @@ pub fn find_magics(piece: Piece) {
     for sq in 0..64 {
         // Create the mask for either the rook or bishop.
         let mask = match piece {
-            Piece::Rook => mask_rook_attacks(sq),
-            Piece::Bishop => mask_bishop_attacks(sq),
+            Piece::Rook => MoveGenerator::mask_rook_attacks(sq),
+            Piece::Bishop => MoveGenerator::mask_bishop_attacks(sq),
         };
 
         // Precalculate needed values.
@@ -186,8 +184,8 @@ pub fn find_magics(piece: Piece) {
         // Create attack boards for the current square/blocker combo (either
         // rook or bishop).
         let attack_boards = match piece {
-            Piece::Rook => generate_rook_attack_boards(sq, &blocker_boards),
-            Piece::Bishop => generate_bishop_attack_boards(sq, &blocker_boards),
+            Piece::Rook => MoveGenerator::generate_rook_attack_boards(sq, &blocker_boards),
+            Piece::Bishop => MoveGenerator::generate_bishop_attack_boards(sq, &blocker_boards),
         };
 
         // Done calculating needed data. Create a new magic.
@@ -257,7 +255,10 @@ pub fn find_magics(piece: Piece) {
 }
 
 fn found_magic(square: Square, m: Magic, offset: u64, end: u64, attempts: u64) {
-    println!("{:#018x},", m.nr);
+    println!(
+        "{}: {:24}u64 (offset: {:6}, end: {:6}, attempts: {})",
+        SQUARE_NAME[square as usize], m.nr, offset, end, attempts
+    );
 }
 
 #[derive(Copy, Clone)]

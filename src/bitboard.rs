@@ -1,6 +1,6 @@
 use std::{
     fmt,
-    ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, Mul, Not, Shl, Shr},
+    ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, Mul, Not, Shl, Shr},
 };
 
 use crate::defs::Square;
@@ -139,6 +139,14 @@ impl Mul<u64> for Bitboard {
 
     fn mul(self, rhs: u64) -> Self::Output {
         Self(self.0 * rhs)
+    }
+}
+
+impl BitXor<Bitboard> for Bitboard {
+    type Output = Self;
+
+    fn bitxor(self, rhs: Bitboard) -> Self::Output {
+        Self(self.0 ^ rhs.0)
     }
 }
 
