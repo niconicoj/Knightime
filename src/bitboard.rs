@@ -183,6 +183,23 @@ impl Bitboard {
             false => count,
         };
     }
+
+    pub fn get_blocker_boards(&self) -> Vec<Bitboard> {
+        let mut bb_blocker_boards = Vec::new();
+        let mut n: u64 = 0;
+
+        // Carry-Rippler
+        // https://www.chessprogramming.org/Traversing_Subsets_of_a_Set
+        loop {
+            bb_blocker_boards.push(Bitboard::new(n));
+            n = n.wrapping_sub(self.0) & self.0;
+            if n == 0 {
+                break;
+            }
+        }
+
+        bb_blocker_boards
+    }
 }
 
 #[cfg(test)]

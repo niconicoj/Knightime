@@ -70,6 +70,14 @@ pub fn generate_bishop_attacks() -> Vec<Bitboard> {
     bishop_attacks
 }
 
+pub fn generate_bishop_attack_boards(square: Square, blockers: &[Bitboard]) -> Vec<Bitboard> {
+    let mut attack_boards = vec![];
+    for b in blockers.iter() {
+        attack_boards.push(generate_bishop_attacks_otf(square, *b));
+    }
+    attack_boards
+}
+
 pub fn mask_rook_attacks(square: Square) -> Bitboard {
     let mut bitboard = Bitboard::default();
 
@@ -133,6 +141,14 @@ pub fn generate_rook_attacks_otf(square: Square, blockers: Bitboard) -> Bitboard
     }
 
     attacks
+}
+
+pub fn generate_rook_attack_boards(square: Square, blockers: &[Bitboard]) -> Vec<Bitboard> {
+    let mut attack_boards = vec![];
+    for b in blockers.iter() {
+        attack_boards.push(generate_rook_attacks_otf(square, *b));
+    }
+    attack_boards
 }
 
 pub fn set_occupancy(index: u64, mut attack_mask: Bitboard) -> Bitboard {
