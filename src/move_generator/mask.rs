@@ -1,4 +1,9 @@
-use crate::{bitboard::Bitboard, constants::*, defs::Square, mov::*};
+use crate::{
+    bitboard::Bitboard,
+    constants::*,
+    defs::{Side, Square},
+    mov::*,
+};
 
 use super::MoveGenerator;
 

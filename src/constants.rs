@@ -1,11 +1,5 @@
 use crate::defs::Square;
 
-#[derive(Copy, Clone, PartialEq)]
-pub enum Side {
-    White,
-    Black,
-}
-
 pub const A1: Square = 0;
 pub const A2: Square = 8;
 pub const A3: Square = 16;

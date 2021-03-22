@@ -1,24 +1,28 @@
 extern crate nightime;
 
-use nightime::{bitboard::Bitboard, constants::*, move_generator::MoveGenerator};
+use nightime::{bitboard::Bitboard, constants::*, defs::Side, move_generator::MoveGenerator};
 
 fn main() {
-    let movegen = MoveGenerator::new();
+    let movgen = MoveGenerator::new();
 
-    let king_attack = movegen.get_king_attacks(A2);
-    println!("{}", king_attack);
+    let mut mv = movgen.get_knight_attacks(A4);
+    println!("{}", mv);
+    mv = movgen.get_knight_attacks(D1);
+    println!("{}", mv);
+    mv = movgen.get_knight_attacks(H5);
+    println!("{}", mv);
+    mv = movgen.get_knight_attacks(E8);
+    println!("{}", mv);
 
-    let white_pawn_attack = movegen.get_pawn_attacks(B5, nightime::constants::Side::White);
-    println!("{}", white_pawn_attack);
+    mv = movgen.get_knight_attacks(A1);
+    println!("{}", mv);
+    mv = movgen.get_knight_attacks(A8);
+    println!("{}", mv);
+    mv = movgen.get_knight_attacks(H1);
+    println!("{}", mv);
+    mv = movgen.get_knight_attacks(H8);
+    println!("{}", mv);
 
-    let black_pawn_attack = movegen.get_pawn_attacks(B5, nightime::constants::Side::Black);
-    println!("{}", black_pawn_attack);
-
-    let knight_attack = movegen.get_knight_attacks(G4);
-
-    println!("{}", knight_attack);
-
-    let rook_attack = movegen.get_rook_attacks(C5, Bitboard::new(0x0000a0100010a000));
-
-    println!("{}", rook_attack);
+    mv = movgen.get_knight_attacks(D4);
+    println!("{}", mv);
 }

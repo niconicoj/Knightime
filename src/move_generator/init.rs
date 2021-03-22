@@ -1,7 +1,6 @@
 use crate::{
     bitboard::Bitboard,
-    constants::Side,
-    defs::Piece,
+    defs::{Piece, Side},
     magic::{Magic, BISHOP_MAGIC_NUMBERS, BISHOP_TABLE_SIZE, ROOK_MAGIC_NUMBERS, ROOK_TABLE_SIZE},
 };
 
