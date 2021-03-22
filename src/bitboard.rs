@@ -6,7 +6,7 @@ use std::{
 use crate::defs::Square;
 
 #[derive(PartialEq, PartialOrd, Clone, Copy, Debug)]
-pub struct Bitboard(u64);
+pub struct Bitboard(pub u64);
 
 impl Default for Bitboard {
     fn default() -> Self {
@@ -28,7 +28,7 @@ impl fmt::Display for Bitboard {
                     false => write!(f, "- ")?,
                 }
             }
-            println!();
+            writeln!(f)?;
         }
 
         writeln!(f)?;

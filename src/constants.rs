@@ -1,4 +1,7 @@
-use crate::defs::{Side, Square};
+use crate::{
+    bitboard::Bitboard,
+    defs::{Side, Square},
+};
 
 pub const A1: Square = 0;
 pub const A2: Square = 8;
@@ -97,13 +100,26 @@ pub const RANK_78: u64 = 0xFFFF000000000000;
 pub const DIAGONAL_AH: u64 = 0x8040201008040201;
 pub const DIAGONAL_HA: u64 = 0x0102040810204080;
 
-pub const BISHOP_RELEVANT_BITS: [u32; 64] = [
-    6, 5, 5, 5, 5, 5, 5, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 7, 7, 7, 7, 5, 5, 5, 5, 7, 9, 9, 7, 5, 5,
-    5, 5, 7, 9, 9, 7, 5, 5, 5, 5, 7, 7, 7, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 5, 5, 5, 5, 5, 5, 6,
+pub const INITIAL_WHITE_POSITIONS: [Bitboard; 6] = [
+    Bitboard(0x0000000000000010),
+    Bitboard(0x0000000000000008),
+    Bitboard(0x000000000000FF00),
+    Bitboard(0x0000000000000042),
+    Bitboard(0x0000000000000024),
+    Bitboard(0x0000000000000081),
 ];
 
-pub const ROOK_RELEVANT_BITS: [u32; 64] = [
-    12, 11, 11, 11, 11, 11, 11, 12, 11, 10, 10, 10, 10, 10, 10, 11, 11, 10, 10, 10, 10, 10, 10, 11,
-    11, 10, 10, 10, 10, 10, 10, 11, 11, 10, 10, 10, 10, 10, 10, 11, 11, 10, 10, 10, 10, 10, 10, 11,
-    11, 10, 10, 10, 10, 10, 10, 11, 12, 11, 11, 11, 11, 11, 11, 12,
+pub const INITIAL_BLACK_POSITIONS: [Bitboard; 6] = [
+    Bitboard(0x1000000000000000),
+    Bitboard(0x0800000000000000),
+    Bitboard(0x00FF000000000000),
+    Bitboard(0x4200000000000000),
+    Bitboard(0x2400000000000000),
+    Bitboard(0x8100000000000000),
+];
+
+pub const INITIAL_OCCUPANCIES: [Bitboard; 3] = [
+    Bitboard(0x000000000000FFFF),
+    Bitboard(0xFFFF000000000000),
+    Bitboard(0xFFFF00000000FFFF),
 ];
