@@ -154,6 +154,10 @@ pub fn find_magics(piece: Piece) {
     let mut table = match piece {
         Piece::Rook => vec![Bitboard::default(); ROOK_TABLE_SIZE],
         Piece::Bishop => vec![Bitboard::default(); BISHOP_TABLE_SIZE],
+        _ => panic!(
+            "can only generate magic for rook or bishop, {:?} was passed.",
+            piece
+        ),
     };
     let mut random = ChaChaRng::from_entropy();
     let mut offset = 0;
@@ -165,12 +169,20 @@ pub fn find_magics(piece: Piece) {
         Piece::Bishop => {
             println!("Finding magics for bishop");
         }
+        _ => panic!(
+            "can only generate magic for rook or bishop, {:?} was passed.",
+            piece
+        ),
     }
     for sq in 0..64 {
         // Create the mask for either the rook or bishop.
         let mask = match piece {
             Piece::Rook => MoveGenerator::mask_rook_attacks(sq),
             Piece::Bishop => MoveGenerator::mask_bishop_attacks(sq),
+            _ => panic!(
+                "can only generate magic for rook or bishop, {:?} was passed.",
+                piece
+            ),
         };
 
         // Precalculate needed values.
@@ -186,6 +198,10 @@ pub fn find_magics(piece: Piece) {
         let attack_boards = match piece {
             Piece::Rook => MoveGenerator::generate_rook_attack_boards(sq, &blocker_boards),
             Piece::Bishop => MoveGenerator::generate_bishop_attack_boards(sq, &blocker_boards),
+            _ => panic!(
+                "can only generate magic for rook or bishop, {:?} was passed.",
+                piece
+            ),
         };
 
         // Done calculating needed data. Create a new magic.

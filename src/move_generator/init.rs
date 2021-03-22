@@ -38,6 +38,10 @@ impl MoveGenerator {
             let mask = match piece {
                 Piece::Rook => MoveGenerator::mask_rook_attacks(sq),
                 Piece::Bishop => MoveGenerator::mask_bishop_attacks(sq),
+                _ => panic!(
+                    "can only generate magic for rook or bishop, {:?} was passed.",
+                    piece
+                ),
             };
 
             let bits = mask.get_value().count_ones(); // Number of set bits in the mask
@@ -48,6 +52,10 @@ impl MoveGenerator {
             let attack_boards = match piece {
                 Piece::Rook => MoveGenerator::generate_rook_attack_boards(sq, &blocker_boards),
                 Piece::Bishop => MoveGenerator::generate_bishop_attack_boards(sq, &blocker_boards),
+                _ => panic!(
+                    "can only generate magic for rook or bishop, {:?} was passed.",
+                    piece
+                ),
             };
 
             let mut magic: Magic = Default::default();
@@ -58,6 +66,10 @@ impl MoveGenerator {
             magic.nr = match piece {
                 Piece::Bishop => BISHOP_MAGIC_NUMBERS[sq as usize],
                 Piece::Rook => ROOK_MAGIC_NUMBERS[sq as usize],
+                _ => panic!(
+                    "can only generate magic for rook or bishop, {:?} was passed.",
+                    piece
+                ),
             };
 
             for i in 0..permutations {
@@ -67,6 +79,10 @@ impl MoveGenerator {
                 let table = match piece {
                     Piece::Rook => &mut self.rooks[..],
                     Piece::Bishop => &mut self.bishops[..],
+                    _ => panic!(
+                        "can only generate magic for rook or bishop, {:?} was passed.",
+                        piece
+                    ),
                 };
 
                 if table[index] == 0 {
@@ -87,6 +103,10 @@ impl MoveGenerator {
                 Piece::Bishop => {
                     self.bishop_magics[sq as usize] = magic;
                 }
+                _ => panic!(
+                    "can only generate magic for rook or bishop, {:?} was passed.",
+                    piece
+                ),
             }
 
             // Do the next magic.
@@ -97,6 +117,10 @@ impl MoveGenerator {
         let expectation = match piece {
             Piece::Rook => ROOK_TABLE_SIZE as u64,
             Piece::Bishop => BISHOP_TABLE_SIZE as u64,
+            _ => panic!(
+                "can only generate magic for rook or bishop, {:?} was passed.",
+                piece
+            ),
         };
         const ERROR: &str = "Initializing magics failed. Check magic numbers.";
 
