@@ -1,7 +1,4 @@
-use crate::{
-    bitboard::Bitboard,
-    defs::{Side, Square},
-};
+use crate::{bitboard::Bitboard, defs::Square};
 
 pub const A1: Square = 0;
 pub const A2: Square = 8;
@@ -87,6 +84,11 @@ pub const UNICODE_PIECE: [[&str; 6]; 2] = [
     ["♚", "♛", "♟︎", "♞", "♝", "♜"],
 ];
 
+pub const ASCII_PIECE: [[&str; 6]; 2] = [
+    ["K", "Q", "P", "N", "B", "R"],
+    ["k", "q", "p", "n", "b", "r"],
+];
+
 pub const FILE_A: u64 = 0x0101010101010101;
 pub const FILE_AB: u64 = 0x0303030303030303;
 pub const FILE_H: u64 = 0x8080808080808080;
@@ -99,27 +101,3 @@ pub const RANK_78: u64 = 0xFFFF000000000000;
 
 pub const DIAGONAL_AH: u64 = 0x8040201008040201;
 pub const DIAGONAL_HA: u64 = 0x0102040810204080;
-
-pub const INITIAL_WHITE_POSITIONS: [Bitboard; 6] = [
-    Bitboard(0x0000000000000010),
-    Bitboard(0x0000000000000008),
-    Bitboard(0x000000000000FF00),
-    Bitboard(0x0000000000000042),
-    Bitboard(0x0000000000000024),
-    Bitboard(0x0000000000000081),
-];
-
-pub const INITIAL_BLACK_POSITIONS: [Bitboard; 6] = [
-    Bitboard(0x1000000000000000),
-    Bitboard(0x0800000000000000),
-    Bitboard(0x00FF000000000000),
-    Bitboard(0x4200000000000000),
-    Bitboard(0x2400000000000000),
-    Bitboard(0x8100000000000000),
-];
-
-pub const INITIAL_OCCUPANCIES: [Bitboard; 3] = [
-    Bitboard(0x000000000000FFFF),
-    Bitboard(0xFFFF000000000000),
-    Bitboard(0xFFFF00000000FFFF),
-];

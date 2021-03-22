@@ -1,15 +1,7 @@
 extern crate nightime;
 
-use nightime::{
-    bitboard::Bitboard,
-    board::Board,
-    constants::*,
-    defs::{Piece, Side},
-    move_generator::MoveGenerator,
-};
+use nightime::board::Board;
 
 fn main() {
-    let board = Board::default();
-
-    println!("{}", board);
+    let board = Board::from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 }
