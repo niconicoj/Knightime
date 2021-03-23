@@ -6,7 +6,7 @@ use std::fmt;
 use crate::{
     bitboard::Bitboard,
     constants::{SQUARE_NAME, UNICODE_PIECE},
-    defs::{Piece, Side, Square},
+    defs::{CastleRights, Piece, Side, Square},
 };
 
 use self::{
@@ -22,7 +22,7 @@ pub struct Board {
     occupancies: [Bitboard; 3],
     side_to_move: Side,
     en_passant_square: Option<Square>,
-    castling_rights: u32,
+    castling_rights: [CastleRights; 2],
 }
 
 impl fmt::Display for Board {
@@ -36,7 +36,11 @@ impl fmt::Display for Board {
             None => "none",
         };
 
-        let castling_rights = format!("{:04b}", self.castling_rights);
+        let castling_rights = format!(
+            "{}{}",
+            self.castling_rights[0].to_string(Side::White),
+            self.castling_rights[1].to_string(Side::Black)
+        );
         writeln!(f)?;
         for rank in (0u64..8u64).rev() {
             for file in 0u64..8u64 {
@@ -73,7 +77,7 @@ impl Board {
             side_to_move: Side::White,
             occupancies: INITIAL_OCCUPANCIES,
             en_passant_square: None,
-            castling_rights: 15,
+            castling_rights: [CastleRights::Both; 2],
         }
     }
 
@@ -81,11 +85,16 @@ impl Board {
         // first block is in regard to piece placement, it start from rank 8 all the way to rank 1
         let fen_parts: Vec<&str> = fen_string.split(' ').collect();
 
-        assert_eq!(fen_parts.len(), 6, "bad fen string format");
+        match fen_parts.len().eq(&6) {
+            false => return Err(ParseFenError::BadFenFormat),
+            true => {}
+        };
 
         let bitboards = Self::parse_fen_positions(fen_parts[0])?;
+        let side_to_move = Self::parse_fen_side_to_move(fen_parts[1])?;
+        let castling_rights = Self::parse_fen_castling_rights(fen_parts[2])?;
 
-        Err(ParseFenError::UnexpectedChar("sorry"))
+        Err(ParseFenError::UnexpectedChar)
     }
 
     fn parse_fen_positions(fen_position: &str) -> Result<[[Bitboard; 6]; 2], ParseFenError> {
@@ -107,9 +116,7 @@ impl Board {
                         file += incr;
                     }
                     None => {
-                        return Err(ParseFenError::UnexpectedChar(
-                            "failed to convert char to digit",
-                        ));
+                        return Err(ParseFenError::UnexpectedChar);
                     }
                 },
                 'K' => {
@@ -160,18 +167,43 @@ impl Board {
                     bitboards[Side::Black as usize][Piece::Rook as usize].set_square(square);
                     file += 1;
                 }
-                _ => return Err(ParseFenError::UnexpectedChar("sorry")),
+                _ => return Err(ParseFenError::UnexpectedChar),
             }
         }
 
         Ok(bitboards)
+    }
+
+    fn parse_fen_side_to_move(fen_str: &str) -> Result<Side, ParseFenError> {
+        return match fen_str.chars().nth(0) {
+            Some(char) => match char {
+                'w' => Ok(Side::White),
+                'b' => Ok(Side::Black),
+                _ => Err(ParseFenError::UnexpectedChar),
+            },
+            None => Err(ParseFenError::EmptyString),
+        };
+    }
+
+    fn parse_fen_castling_rights(fen_str: &str) -> Result<[CastleRights; 2], ParseFenError> {
+        let mut castling_rights = [CastleRights::None; 2];
+        for char in fen_str.chars() {
+            match char {
+                '-' => return Ok(castling_rights),
+                'K' => castling_rights[0] = castling_rights[0].add(CastleRights::KingSide),
+                'k' => castling_rights[1] = castling_rights[1].add(CastleRights::KingSide),
+                'Q' => castling_rights[0] = castling_rights[0].add(CastleRights::QueenSide),
+                'q' => castling_rights[1] = castling_rights[1].add(CastleRights::QueenSide),
+                _ => return Err(ParseFenError::UnexpectedChar),
+            };
+        }
+        Ok(castling_rights)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::constants::*;
 
     #[test]
     fn parse_fen_positions_tests() {
@@ -199,6 +231,36 @@ mod tests {
                     Bitboard(0x8100000000000000),
                 ],
             ])
+        );
+    }
+
+    #[test]
+    fn parse_fen_side_to_move_tests() {
+        assert_eq!(Board::parse_fen_side_to_move("w"), Ok(Side::White));
+        assert_eq!(Board::parse_fen_side_to_move("b"), Ok(Side::Black));
+        assert_eq!(
+            Board::parse_fen_side_to_move(""),
+            Err(ParseFenError::EmptyString)
+        );
+        assert_eq!(
+            Board::parse_fen_side_to_move("g"),
+            Err(ParseFenError::UnexpectedChar)
+        );
+    }
+
+    #[test]
+    fn parse_fen_castling_rights_tests() {
+        assert_eq!(
+            Board::parse_fen_castling_rights("-"),
+            Ok([CastleRights::None; 2])
+        );
+        assert_eq!(
+            Board::parse_fen_castling_rights("KQkq"),
+            Ok([CastleRights::Both; 2])
+        );
+        assert_eq!(
+            Board::parse_fen_castling_rights("Kkq"),
+            Ok([CastleRights::KingSide, CastleRights::Both])
         );
     }
 }

@@ -1,6 +1,8 @@
+use std::hint::unreachable_unchecked;
+
 pub type Square = u32;
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum Side {
     White = 0,
     Black = 1,
@@ -23,10 +25,45 @@ pub enum Piece {
     Rook = 5,
 }
 
-#[repr(u32)]
-pub enum Castling {
-    WhiteKingSide = 1,
-    BlackKingSide = 2,
-    WhiteQueenSide = 4,
-    BlackQueenSide = 8,
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Debug, Hash)]
+pub enum CastleRights {
+    None,
+    KingSide,
+    QueenSide,
+    Both,
+}
+
+impl CastleRights {
+    pub fn add(&self, add: CastleRights) -> CastleRights {
+        CastleRights::from_index(self.to_index() | add.to_index())
+    }
+
+    pub fn from_index(i: usize) -> CastleRights {
+        match i {
+            0 => CastleRights::None,
+            1 => CastleRights::KingSide,
+            2 => CastleRights::QueenSide,
+            3 => CastleRights::Both,
+            _ => unsafe { unreachable_unchecked() },
+        }
+    }
+
+    pub fn to_index(&self) -> usize {
+        *self as usize
+    }
+
+    pub fn to_string(&self, side: Side) -> String {
+        let result = match *self {
+            CastleRights::None => "",
+            CastleRights::KingSide => "k",
+            CastleRights::QueenSide => "q",
+            CastleRights::Both => "kq",
+        };
+
+        if side == Side::White {
+            result.to_uppercase()
+        } else {
+            result.to_string()
+        }
+    }
 }

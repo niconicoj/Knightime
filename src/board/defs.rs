@@ -1,4 +1,6 @@
 #[derive(Debug, PartialEq)]
 pub enum ParseFenError {
-    UnexpectedChar(&'static str),
+    UnexpectedChar,
+    EmptyString,
+    BadFenFormat,
 }
