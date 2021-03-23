@@ -6,7 +6,7 @@ use std::fmt;
 use crate::{
     bitboard::Bitboard,
     constants::{SQUARE_NAME, UNICODE_PIECE},
-    defs::{Side, Square},
+    defs::{Piece, Side, Square},
 };
 
 use self::{
@@ -89,6 +89,116 @@ impl Board {
     }
 
     fn parse_fen_positions(fen_position: &str) -> Result<[[Bitboard; 6]; 2], ParseFenError> {
-        Err(ParseFenError::UnexpectedChar("sorry"))
+        let mut bitboards = [EMPTY_POSITION, EMPTY_POSITION];
+
+        let mut rank: u32 = 7;
+        let mut file: u32 = 0;
+
+        for char in fen_position.chars() {
+            let square = rank * 8 + file;
+
+            match char {
+                '/' => {
+                    file = 0;
+                    rank -= 1;
+                }
+                '1'..='8' => match char.to_digit(10) {
+                    Some(incr) => {
+                        file += incr;
+                    }
+                    None => {
+                        return Err(ParseFenError::UnexpectedChar(
+                            "failed to convert char to digit",
+                        ));
+                    }
+                },
+                'K' => {
+                    bitboards[Side::White as usize][Piece::King as usize].set_square(square);
+                    file += 1;
+                }
+                'k' => {
+                    bitboards[Side::Black as usize][Piece::King as usize].set_square(square);
+                    file += 1;
+                }
+                'Q' => {
+                    bitboards[Side::White as usize][Piece::Queen as usize].set_square(square);
+                    file += 1;
+                }
+                'q' => {
+                    bitboards[Side::Black as usize][Piece::Queen as usize].set_square(square);
+                    file += 1;
+                }
+                'P' => {
+                    bitboards[Side::White as usize][Piece::Pawn as usize].set_square(square);
+                    file += 1;
+                }
+                'p' => {
+                    bitboards[Side::Black as usize][Piece::Pawn as usize].set_square(square);
+                    file += 1;
+                }
+                'B' => {
+                    bitboards[Side::White as usize][Piece::Bishop as usize].set_square(square);
+                    file += 1;
+                }
+                'b' => {
+                    bitboards[Side::Black as usize][Piece::Bishop as usize].set_square(square);
+                    file += 1;
+                }
+                'N' => {
+                    bitboards[Side::White as usize][Piece::Knight as usize].set_square(square);
+                    file += 1;
+                }
+                'n' => {
+                    bitboards[Side::Black as usize][Piece::Knight as usize].set_square(square);
+                    file += 1;
+                }
+                'R' => {
+                    bitboards[Side::White as usize][Piece::Rook as usize].set_square(square);
+                    file += 1;
+                }
+                'r' => {
+                    bitboards[Side::Black as usize][Piece::Rook as usize].set_square(square);
+                    file += 1;
+                }
+                _ => return Err(ParseFenError::UnexpectedChar("sorry")),
+            }
+        }
+
+        Ok(bitboards)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::constants::*;
+
+    #[test]
+    fn parse_fen_positions_tests() {
+        assert_eq!(
+            Board::parse_fen_positions("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"),
+            Ok([INITIAL_WHITE_POSITIONS, INITIAL_BLACK_POSITIONS])
+        );
+        assert_eq!(
+            Board::parse_fen_positions("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R"),
+            Ok([
+                [
+                    Bitboard(0x0000000000000010),
+                    Bitboard(0x0000000000200000),
+                    Bitboard(0x000000081000e700),
+                    Bitboard(0x0000001000040000),
+                    Bitboard(0x0000000000001800),
+                    Bitboard(0x0000000000000081),
+                ],
+                [
+                    Bitboard(0x1000000000000000),
+                    Bitboard(0x0010000000000000),
+                    Bitboard(0x002d500002800000),
+                    Bitboard(0x0000220000000000),
+                    Bitboard(0x0040010000000000),
+                    Bitboard(0x8100000000000000),
+                ],
+            ])
+        );
     }
 }
