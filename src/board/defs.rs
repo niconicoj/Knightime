@@ -2,5 +2,5 @@
 pub enum ParseFenError {
     UnexpectedChar,
     EmptyString,
-    BadFenFormat,
+    BadFenFormat(&'static str),
 }

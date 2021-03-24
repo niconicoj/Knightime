@@ -47,14 +47,21 @@ impl fmt::Display for Board {
                 if file == 0 {
                     print!("{}   ", rank + 1);
                 }
+
+                let mut occupied = false;
                 let square = (rank * 8 + file) as Square;
                 for (side, bitboards) in self.bitboards.iter().enumerate() {
                     for (piece, bitboard) in bitboards.iter().enumerate() {
                         if bitboard.get_square(square) {
+                            occupied = true;
                             write!(f, "{} ", UNICODE_PIECE[side as usize][piece as usize])?;
                             break;
                         }
                     }
+                }
+
+                if !occupied {
+                    write!(f, "  ")?;
                 }
             }
             writeln!(f)?;
@@ -83,18 +90,25 @@ impl Board {
 
     pub fn from_fen(fen_string: &str) -> Result<Self, ParseFenError> {
         // first block is in regard to piece placement, it start from rank 8 all the way to rank 1
-        let fen_parts: Vec<&str> = fen_string.split(' ').collect();
+        let fen_parts: Vec<&str> = fen_string.trim().split(' ').collect();
 
-        match fen_parts.len().eq(&6) {
-            false => return Err(ParseFenError::BadFenFormat),
+        match fen_parts.len() == 6 {
+            false => return Err(ParseFenError::BadFenFormat("wrong number of args")),
             true => {}
         };
 
         let bitboards = Self::parse_fen_positions(fen_parts[0])?;
         let side_to_move = Self::parse_fen_side_to_move(fen_parts[1])?;
         let castling_rights = Self::parse_fen_castling_rights(fen_parts[2])?;
+        let en_passant_square = Self::parse_fen_en_passant_square(fen_parts[3])?;
 
-        Err(ParseFenError::UnexpectedChar)
+        Ok(Self {
+            bitboards: bitboards,
+            occupancies: Self::compute_occupancies(bitboards),
+            side_to_move: side_to_move,
+            en_passant_square: en_passant_square,
+            castling_rights: castling_rights,
+        })
     }
 
     fn parse_fen_positions(fen_position: &str) -> Result<[[Bitboard; 6]; 2], ParseFenError> {
@@ -174,6 +188,16 @@ impl Board {
         Ok(bitboards)
     }
 
+    fn compute_occupancies(bitboards: [[Bitboard; 6]; 2]) -> [Bitboard; 3] {
+        let mut occupancies = [Bitboard(0); 3];
+
+        occupancies[0] = bitboards[0].iter().fold(Bitboard(0), |acc, &bb| acc | bb);
+        occupancies[1] = bitboards[1].iter().fold(Bitboard(0), |acc, &bb| acc | bb);
+        occupancies[2] = occupancies[1] | occupancies[0];
+
+        occupancies
+    }
+
     fn parse_fen_side_to_move(fen_str: &str) -> Result<Side, ParseFenError> {
         return match fen_str.chars().nth(0) {
             Some(char) => match char {
@@ -198,6 +222,23 @@ impl Board {
             };
         }
         Ok(castling_rights)
+    }
+
+    fn parse_fen_en_passant_square(fen_str: &str) -> Result<Option<Square>, ParseFenError> {
+        let mut rank = 0;
+        let mut file = 0;
+        for char in fen_str.chars() {
+            match char {
+                '-' => return Ok(None),
+                'a'..='h' => {
+                    println!("{}", char as u32);
+                    file = char as u32 - 97;
+                }
+                '3' | '6' => rank = char.to_digit(10).unwrap() - 1,
+                _ => return Err(ParseFenError::UnexpectedChar),
+            };
+        }
+        Ok(Some(rank * 8 + file))
     }
 }
 
@@ -261,6 +302,24 @@ mod tests {
         assert_eq!(
             Board::parse_fen_castling_rights("Kkq"),
             Ok([CastleRights::KingSide, CastleRights::Both])
+        );
+    }
+
+    #[test]
+    fn parse_fen_en_passant_square_tests() {
+        assert_eq!(Board::parse_fen_en_passant_square("-"), Ok(None));
+        assert_eq!(Board::parse_fen_en_passant_square("a6"), Ok(Some(40)));
+        assert_eq!(
+            Board::parse_fen_en_passant_square("g5"),
+            Err(ParseFenError::UnexpectedChar)
+        );
+    }
+
+    #[test]
+    fn compute_occupancies_tests() {
+        assert_eq!(
+            Board::compute_occupancies([INITIAL_WHITE_POSITIONS, INITIAL_BLACK_POSITIONS]),
+            INITIAL_OCCUPANCIES
         );
     }
 }
