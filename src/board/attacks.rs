@@ -56,6 +56,15 @@ impl Board {
             return true;
         }
 
+        if (self.bitboards[side as usize][Piece::Queen as usize]
+            & self
+                .move_generator
+                .get_queen_attacks(square, self.occupancies[2]))
+            != 0
+        {
+            return true;
+        }
+
         false
     }
 }
