@@ -1,4 +1,4 @@
-use crate::{bitboard::Bitboard, defs::Square};
+use crate::defs::Square;
 
 pub const A1: Square = 0;
 pub const A2: Square = 8;

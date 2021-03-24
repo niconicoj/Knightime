@@ -32,9 +32,3 @@ pub const EMPTY_POSITION: [Bitboard; 6] = [
     Bitboard(0x0000000000000000),
     Bitboard(0x0000000000000000),
 ];
-
-pub const EMPTY_OCCUPANCIES: [Bitboard; 3] = [
-    Bitboard(0x0000000000000000),
-    Bitboard(0x0000000000000000),
-    Bitboard(0x0000000000000000),
-];

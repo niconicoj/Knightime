@@ -1,3 +1,4 @@
+mod attacks;
 mod constants;
 mod defs;
 
@@ -7,12 +8,12 @@ use crate::{
     bitboard::Bitboard,
     constants::{SQUARE_NAME, UNICODE_PIECE},
     defs::{CastleRights, Piece, Side, Square},
+    move_generator::MoveGenerator,
 };
 
 use self::{
     constants::{
-        EMPTY_OCCUPANCIES, EMPTY_POSITION, INITIAL_BLACK_POSITIONS, INITIAL_OCCUPANCIES,
-        INITIAL_WHITE_POSITIONS,
+        EMPTY_POSITION, INITIAL_BLACK_POSITIONS, INITIAL_OCCUPANCIES, INITIAL_WHITE_POSITIONS,
     },
     defs::ParseFenError,
 };
@@ -23,6 +24,7 @@ pub struct Board {
     side_to_move: Side,
     en_passant_square: Option<Square>,
     castling_rights: [CastleRights; 2],
+    move_generator: MoveGenerator,
 }
 
 impl fmt::Display for Board {
@@ -37,7 +39,7 @@ impl fmt::Display for Board {
         };
 
         let castling_rights = format!(
-            "{}{}",
+            "{} {}",
             self.castling_rights[0].to_string(Side::White),
             self.castling_rights[1].to_string(Side::Black)
         );
@@ -61,7 +63,7 @@ impl fmt::Display for Board {
                 }
 
                 if !occupied {
-                    write!(f, "  ")?;
+                    write!(f, ". ")?;
                 }
             }
             writeln!(f)?;
@@ -85,6 +87,7 @@ impl Board {
             occupancies: INITIAL_OCCUPANCIES,
             en_passant_square: None,
             castling_rights: [CastleRights::Both; 2],
+            move_generator: MoveGenerator::new(),
         }
     }
 
@@ -108,6 +111,7 @@ impl Board {
             side_to_move: side_to_move,
             en_passant_square: en_passant_square,
             castling_rights: castling_rights,
+            move_generator: MoveGenerator::new(),
         })
     }
 

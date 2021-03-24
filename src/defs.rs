@@ -7,6 +7,21 @@ pub enum Side {
     White = 0,
     Black = 1,
 }
+
+impl Into<usize> for Side {
+    fn into(self) -> usize {
+        self as usize
+    }
+}
+
+impl Side {
+    pub fn get_opposite_side(&self) -> Side {
+        match self {
+            Side::White => Side::Black,
+            Side::Black => Side::White,
+        }
+    }
+}
 #[derive(Copy, Clone, PartialEq)]
 pub enum Sides {
     White = 0,
@@ -23,6 +38,12 @@ pub enum Piece {
     Knight = 3,
     Bishop = 4,
     Rook = 5,
+}
+
+impl Into<usize> for Piece {
+    fn into(self) -> usize {
+        self as usize
+    }
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Debug, Hash)]
@@ -54,10 +75,10 @@ impl CastleRights {
 
     pub fn to_string(&self, side: Side) -> String {
         let result = match *self {
-            CastleRights::None => "-",
-            CastleRights::KingSide => "k",
-            CastleRights::QueenSide => "q",
-            CastleRights::Both => "kq",
+            CastleRights::None => "- -",
+            CastleRights::KingSide => "k -",
+            CastleRights::QueenSide => "- q",
+            CastleRights::Both => "k q",
         };
 
         if side == Side::White {
