@@ -54,7 +54,7 @@ impl CastleRights {
 
     pub fn to_string(&self, side: Side) -> String {
         let result = match *self {
-            CastleRights::None => "",
+            CastleRights::None => "-",
             CastleRights::KingSide => "k",
             CastleRights::QueenSide => "q",
             CastleRights::Both => "kq",
