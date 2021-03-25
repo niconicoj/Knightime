@@ -150,6 +150,21 @@ impl BitXor<Bitboard> for Bitboard {
     }
 }
 
+impl Iterator for Bitboard {
+    type Item = Square;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let next = self.get_ls1b_index();
+        match next {
+            Some(square) => {
+                self.clear_square(square);
+            }
+            None => {}
+        }
+        next
+    }
+}
+
 impl Bitboard {
     pub fn new(value: u64) -> Self {
         Self(value)
@@ -184,11 +199,11 @@ impl Bitboard {
         self.0.count_ones()
     }
 
-    pub fn get_ls1b_index(&self) -> u32 {
+    pub fn get_ls1b_index(&self) -> Option<u32> {
         let count = self.0.trailing_zeros();
-        return match count >= 64 {
-            true => 0,
-            false => count,
+        return match count.cmp(&64) {
+            std::cmp::Ordering::Less => Some(count),
+            _ => None,
         };
     }
 

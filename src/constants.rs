@@ -79,6 +79,8 @@ pub const SQUARE_NAME: [&str; 64] = [
     "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7", "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
 ];
 
+pub const SIDE_NAME: [&str; 2] = ["white", "black"];
+
 pub const UNICODE_PIECE: [[&str; 6]; 2] = [
     ["♔", "♕", "♙", "♘", "♗", "♖"],
     ["♚", "♛", "♟︎", "♞", "♝", "♜"],

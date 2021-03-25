@@ -1,5 +1,6 @@
 use crate::{
     bitboard::Bitboard,
+    constants::*,
     defs::{Piece, Side, Square},
 };
 
@@ -66,6 +67,70 @@ impl Board {
         }
 
         false
+    }
+
+    pub fn generate_moves(&self, side: Side) {
+        println!("quiet pawn moves for {} :", SIDE_NAME[side as usize]);
+        self.generate_quiet_pawn_moves(side);
+    }
+
+    fn generate_quiet_pawn_moves(&self, side: Side) {
+        let bitboard = self.bitboards[side as usize][Piece::Pawn as usize];
+
+        for square in bitboard.into_iter() {
+            let target_square = match side {
+                Side::White => square + 8,
+                Side::Black => square - 8,
+            };
+            if !(A2..=H7).contains(&target_square) {
+                // promotion happens
+                print!(
+                    "{}={} ",
+                    SQUARE_NAME[target_square as usize],
+                    UNICODE_PIECE[side as usize][Piece::Queen as usize]
+                );
+                print!(
+                    "{}={} ",
+                    SQUARE_NAME[target_square as usize],
+                    UNICODE_PIECE[side as usize][Piece::Rook as usize]
+                );
+                print!(
+                    "{}={} ",
+                    SQUARE_NAME[target_square as usize],
+                    UNICODE_PIECE[side as usize][Piece::Bishop as usize]
+                );
+                print!(
+                    "{}={} ",
+                    SQUARE_NAME[target_square as usize],
+                    UNICODE_PIECE[side as usize][Piece::Knight as usize]
+                );
+            } else {
+                if !self.occupancies[2].get_square(target_square) {
+                    print!("{} ", SQUARE_NAME[target_square as usize]);
+                }
+                let two_squares_target = match side {
+                    Side::White => square + 16,
+                    Side::Black => square - 16,
+                };
+                match side {
+                    Side::White => {
+                        if (A2..=H2).contains(&square)
+                            && !self.occupancies[2].get_square(two_squares_target)
+                        {
+                            print!("{} ", SQUARE_NAME[two_squares_target as usize]);
+                        }
+                    }
+                    Side::Black => {
+                        if (A7..=H7).contains(&square)
+                            && !self.occupancies[2].get_square(two_squares_target)
+                        {
+                            print!("{} ", SQUARE_NAME[two_squares_target as usize]);
+                        }
+                    }
+                }
+            }
+        }
+        println!();
     }
 }
 
