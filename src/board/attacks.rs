@@ -70,67 +70,128 @@ impl Board {
     }
 
     pub fn generate_moves(&self, side: Side) {
-        println!("quiet pawn moves for {} :", SIDE_NAME[side as usize]);
-        self.generate_quiet_pawn_moves(side);
+        println!("moves for {} :", SIDE_NAME[side as usize]);
+        self.generate_pawn_moves(side);
     }
 
-    fn generate_quiet_pawn_moves(&self, side: Side) {
+    fn generate_pawn_moves(&self, side: Side) {
         let bitboard = self.bitboards[side as usize][Piece::Pawn as usize];
 
         for square in bitboard.into_iter() {
-            let target_square = match side {
-                Side::White => square + 8,
-                Side::Black => square - 8,
+            self.generate_quiet_pawn_move(square, side);
+            self.generate_noisy_pawn_move(square, side);
+        }
+        println!();
+    }
+
+    fn generate_quiet_pawn_move(&self, square: Square, side: Side) {
+        let target_square = match side {
+            Side::White => square + 8,
+            Side::Black => square - 8,
+        };
+        if !(A2..=H7).contains(&target_square) {
+            // promotion happens
+            print!(
+                "{}={} ",
+                SQUARE_NAME[target_square as usize],
+                UNICODE_PIECE[side as usize][Piece::Queen as usize]
+            );
+            print!(
+                "{}={} ",
+                SQUARE_NAME[target_square as usize],
+                UNICODE_PIECE[side as usize][Piece::Rook as usize]
+            );
+            print!(
+                "{}={} ",
+                SQUARE_NAME[target_square as usize],
+                UNICODE_PIECE[side as usize][Piece::Bishop as usize]
+            );
+            print!(
+                "{}={} ",
+                SQUARE_NAME[target_square as usize],
+                UNICODE_PIECE[side as usize][Piece::Knight as usize]
+            );
+        } else {
+            if !self.occupancies[2].get_square(target_square) {
+                print!("{} ", SQUARE_NAME[target_square as usize]);
+            }
+            let two_squares_target = match side {
+                Side::White => square + 16,
+                Side::Black => square - 16,
             };
-            if !(A2..=H7).contains(&target_square) {
-                // promotion happens
-                print!(
-                    "{}={} ",
-                    SQUARE_NAME[target_square as usize],
-                    UNICODE_PIECE[side as usize][Piece::Queen as usize]
-                );
-                print!(
-                    "{}={} ",
-                    SQUARE_NAME[target_square as usize],
-                    UNICODE_PIECE[side as usize][Piece::Rook as usize]
-                );
-                print!(
-                    "{}={} ",
-                    SQUARE_NAME[target_square as usize],
-                    UNICODE_PIECE[side as usize][Piece::Bishop as usize]
-                );
-                print!(
-                    "{}={} ",
-                    SQUARE_NAME[target_square as usize],
-                    UNICODE_PIECE[side as usize][Piece::Knight as usize]
-                );
-            } else {
-                if !self.occupancies[2].get_square(target_square) {
-                    print!("{} ", SQUARE_NAME[target_square as usize]);
-                }
-                let two_squares_target = match side {
-                    Side::White => square + 16,
-                    Side::Black => square - 16,
-                };
-                match side {
-                    Side::White => {
-                        if (A2..=H2).contains(&square)
-                            && !self.occupancies[2].get_square(two_squares_target)
-                        {
-                            print!("{} ", SQUARE_NAME[two_squares_target as usize]);
-                        }
+            match side {
+                Side::White => {
+                    if (A2..=H2).contains(&square)
+                        && !self.occupancies[2].get_square(two_squares_target)
+                    {
+                        print!("{} ", SQUARE_NAME[two_squares_target as usize]);
                     }
-                    Side::Black => {
-                        if (A7..=H7).contains(&square)
-                            && !self.occupancies[2].get_square(two_squares_target)
-                        {
-                            print!("{} ", SQUARE_NAME[two_squares_target as usize]);
-                        }
+                }
+                Side::Black => {
+                    if (A7..=H7).contains(&square)
+                        && !self.occupancies[2].get_square(two_squares_target)
+                    {
+                        print!("{} ", SQUARE_NAME[two_squares_target as usize]);
                     }
                 }
             }
         }
-        println!();
+    }
+
+    fn generate_noisy_pawn_move(&self, square: Square, side: Side) {
+        let attacks = self.move_generator.get_pawn_attacks(square, side)
+            & self.occupancies[side.get_opposite_side() as usize];
+
+        for target_square in attacks.into_iter() {
+            if !(A2..=H7).contains(&target_square) {
+                // promotion happens
+                print!(
+                    "{}×{}={} ",
+                    SQUARE_NAME[square as usize].chars().next().unwrap(),
+                    SQUARE_NAME[target_square as usize],
+                    UNICODE_PIECE[side as usize][Piece::Queen as usize]
+                );
+                print!(
+                    "{}×{}={} ",
+                    SQUARE_NAME[square as usize].chars().next().unwrap(),
+                    SQUARE_NAME[target_square as usize],
+                    UNICODE_PIECE[side as usize][Piece::Rook as usize]
+                );
+                print!(
+                    "{}×{}={} ",
+                    SQUARE_NAME[square as usize].chars().next().unwrap(),
+                    SQUARE_NAME[target_square as usize],
+                    UNICODE_PIECE[side as usize][Piece::Bishop as usize]
+                );
+                print!(
+                    "{}×{}={} ",
+                    SQUARE_NAME[square as usize].chars().next().unwrap(),
+                    SQUARE_NAME[target_square as usize],
+                    UNICODE_PIECE[side as usize][Piece::Knight as usize]
+                );
+            } else {
+                print!(
+                    "{}×{} ",
+                    SQUARE_NAME[square as usize].chars().next().unwrap(),
+                    SQUARE_NAME[target_square as usize]
+                );
+            }
+        }
+        match self.en_passant_square {
+            Some(en_passant_square) => {
+                let en_passant_attacks = self.move_generator.get_pawn_attacks(square, side)
+                    & (Bitboard(1u64) << en_passant_square);
+
+                for target_square in en_passant_attacks.into_iter() {
+                    print!(
+                        "{}×{} ",
+                        SQUARE_NAME[square as usize].chars().next().unwrap(),
+                        SQUARE_NAME[target_square as usize]
+                    );
+                }
+            }
+            None => {}
+        }
     }
 }
 

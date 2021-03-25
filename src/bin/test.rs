@@ -4,7 +4,7 @@ use knightime::{board::Board, defs::Side};
 
 fn main() {
     let board =
-        Board::from_fen("r2qk2r/2Pb1pbp/4p1p1/1p1pn3/P2P1Bn1/3B4/p2N1PPP/1Q2K2R w Kkq - 0 19")
+        Board::from_fen("r2qk2r/2Pb2bp/4p1p1/1p1p1pP1/P1nP1B2/3n1P2/p2N3P/1Q4KR w kq f6 0 23")
             .unwrap();
     println!("{}", board);
     board.generate_moves(Side::White);
