@@ -72,7 +72,17 @@ impl Board {
     pub fn generate_moves(&self, side: Side) {
         println!("moves for {} :", SIDE_NAME[side as usize]);
         self.generate_pawn_moves(side);
+        println!();
         self.generate_castling_moves(side);
+        println!();
+        self.generate_knight_moves(side);
+        println!();
+        self.generate_king_moves(side);
+        println!();
+        self.generate_bishop_moves(side);
+        println!();
+        self.generate_rook_moves(side);
+        println!();
     }
 
     fn generate_pawn_moves(&self, side: Side) {
@@ -82,7 +92,6 @@ impl Board {
             self.generate_quiet_pawn_move(square, side);
             self.generate_noisy_pawn_move(square, side);
         }
-        println!();
     }
 
     fn generate_quiet_pawn_move(&self, square: Square, side: Side) {
@@ -229,6 +238,116 @@ impl Board {
             CastleRights::Both => {
                 self.generate_castling_move(side, CastleRights::KingSide);
                 self.generate_castling_move(side, CastleRights::QueenSide);
+            }
+        }
+    }
+
+    fn generate_knight_moves(&self, side: Side) {
+        for square in self.bitboards[side as usize][Piece::Knight as usize].into_iter() {
+            let quiet_moves = self.move_generator.get_knight_attacks(square) & !self.occupancies[2];
+
+            for target_square in quiet_moves.into_iter() {
+                print!(
+                    "{}{} ",
+                    UNICODE_PIECE[side as usize][Piece::Knight as usize],
+                    SQUARE_NAME[target_square as usize],
+                );
+            }
+
+            let captures = self.move_generator.get_knight_attacks(square)
+                & self.occupancies[side.get_opposite_side() as usize];
+
+            for target_square in captures.into_iter() {
+                print!(
+                    "{}×{} ",
+                    UNICODE_PIECE[side as usize][Piece::Knight as usize],
+                    SQUARE_NAME[target_square as usize],
+                );
+            }
+        }
+    }
+
+    fn generate_king_moves(&self, side: Side) {
+        for square in self.bitboards[side as usize][Piece::King as usize].into_iter() {
+            let quiet_moves = self.move_generator.get_king_attacks(square) & !self.occupancies[2];
+
+            for target_square in quiet_moves.into_iter() {
+                print!(
+                    "{}{} ",
+                    UNICODE_PIECE[side as usize][Piece::King as usize],
+                    SQUARE_NAME[target_square as usize],
+                );
+            }
+
+            let captures = self.move_generator.get_king_attacks(square)
+                & self.occupancies[side.get_opposite_side() as usize];
+
+            for target_square in captures.into_iter() {
+                print!(
+                    "{}×{} ",
+                    UNICODE_PIECE[side as usize][Piece::King as usize],
+                    SQUARE_NAME[target_square as usize],
+                );
+            }
+        }
+    }
+
+    fn generate_bishop_moves(&self, side: Side) {
+        for square in self.bitboards[side as usize][Piece::Bishop as usize].into_iter() {
+            let quiet_moves = self
+                .move_generator
+                .get_bishop_attacks(square, self.occupancies[2])
+                & !self.occupancies[2];
+
+            for target_square in quiet_moves.into_iter() {
+                print!(
+                    "{}{} ",
+                    UNICODE_PIECE[side as usize][Piece::Bishop as usize],
+                    SQUARE_NAME[target_square as usize],
+                );
+            }
+
+            let captures = self
+                .move_generator
+                .get_bishop_attacks(square, self.occupancies[2])
+                & self.occupancies[side.get_opposite_side() as usize];
+
+            for target_square in captures.into_iter() {
+                print!(
+                    "{}×{} ",
+                    UNICODE_PIECE[side as usize][Piece::Bishop as usize],
+                    SQUARE_NAME[target_square as usize],
+                );
+            }
+        }
+    }
+
+    fn generate_rook_moves(&self, side: Side) {
+        for square in self.bitboards[side as usize][Piece::Rook as usize].into_iter() {
+            let quiet_moves = self
+                .move_generator
+                .get_rook_attacks(square, self.occupancies[2])
+                & !self.occupancies[2];
+
+            for target_square in quiet_moves.into_iter() {
+                print!(
+                    "{}{} ",
+                    UNICODE_PIECE[side as usize][Piece::Rook as usize],
+                    SQUARE_NAME[target_square as usize],
+                );
+            }
+
+            let captures = self
+                .move_generator
+                .get_rook_attacks(square, self.occupancies[2])
+                & self.occupancies[side.get_opposite_side() as usize];
+
+            for target_square in captures.into_iter() {
+                print!(
+                    "{}×{} ",
+                    UNICODE_PIECE[side as usize][Piece::Rook as usize],
+                    SQUARE_NAME[target_square as usize],
+                );
             }
         }
     }
