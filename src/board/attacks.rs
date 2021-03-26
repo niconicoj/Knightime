@@ -1,7 +1,7 @@
 use crate::{
     bitboard::Bitboard,
     constants::*,
-    defs::{Piece, Side, Square},
+    defs::{CastleRights, Piece, Side, Square},
 };
 
 use super::Board;
@@ -72,6 +72,7 @@ impl Board {
     pub fn generate_moves(&self, side: Side) {
         println!("moves for {} :", SIDE_NAME[side as usize]);
         self.generate_pawn_moves(side);
+        self.generate_castling_moves(side);
     }
 
     fn generate_pawn_moves(&self, side: Side) {
@@ -191,6 +192,44 @@ impl Board {
                 }
             }
             None => {}
+        }
+    }
+
+    fn generate_castling_moves(&self, side: Side) {
+        self.generate_castling_move(side, self.castling_rights[side as usize]);
+    }
+
+    fn generate_castling_move(&self, side: Side, castle: CastleRights) {
+        match castle {
+            CastleRights::None => {}
+            CastleRights::KingSide => {
+                let blockers = match side {
+                    Side::White => (Bitboard(0x60), (E1, F1)),
+                    Side::Black => (Bitboard(0x6000000000000000), (E8, F8)),
+                };
+                if ((blockers.0 & self.occupancies[2]) == 0)
+                    && (!self.is_square_attacked(blockers.1 .0, side.get_opposite_side()))
+                    && (!self.is_square_attacked(blockers.1 .1, side.get_opposite_side()))
+                {
+                    print!("O-O ");
+                }
+            }
+            CastleRights::QueenSide => {
+                let blockers = match side {
+                    Side::White => (Bitboard(0xe), (E1, D1)),
+                    Side::Black => (Bitboard(0x0e00000000000000), (E8, D8)),
+                };
+                if ((blockers.0 & self.occupancies[2]) == 0)
+                    && (!self.is_square_attacked(blockers.1 .0, side.get_opposite_side()))
+                    && (!self.is_square_attacked(blockers.1 .1, side.get_opposite_side()))
+                {
+                    print!("O-O-O ");
+                }
+            }
+            CastleRights::Both => {
+                self.generate_castling_move(side, CastleRights::KingSide);
+                self.generate_castling_move(side, CastleRights::QueenSide);
+            }
         }
     }
 }
