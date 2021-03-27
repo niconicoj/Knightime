@@ -181,10 +181,7 @@ impl Bitboard {
     }
 
     pub fn get_square(&self, square: Square) -> bool {
-        match self.0 & (1u64 << square) {
-            0 => return false,
-            _ => return true,
-        }
+        (self.0 & (1u64 << square)) != 0
     }
 
     pub fn set_square(&mut self, square: Square) {

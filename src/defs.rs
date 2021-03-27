@@ -1,4 +1,4 @@
-use std::hint::unreachable_unchecked;
+use std::{convert::TryFrom, hint::unreachable_unchecked};
 
 pub type Square = u32;
 
@@ -40,9 +40,44 @@ pub enum Piece {
     Rook = 5,
 }
 
-impl Into<usize> for Piece {
-    fn into(self) -> usize {
-        self as usize
+impl TryFrom<u32> for Piece {
+    type Error = &'static str;
+
+    fn try_from(value: u32) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Piece::King),
+            1 => Ok(Piece::Queen),
+            2 => Ok(Piece::Pawn),
+            3 => Ok(Piece::Knight),
+            4 => Ok(Piece::Bishop),
+            5 => Ok(Piece::Rook),
+            _ => Err("fail to decode piece from u32"),
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq)]
+#[repr(u32)]
+pub enum Promotion {
+    None = 0,
+    Queen = 1,
+    Knight = 3,
+    Bishop = 4,
+    Rook = 5,
+}
+
+impl TryFrom<u32> for Promotion {
+    type Error = &'static str;
+
+    fn try_from(value: u32) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Promotion::None),
+            1 => Ok(Promotion::Queen),
+            3 => Ok(Promotion::Knight),
+            4 => Ok(Promotion::Bishop),
+            5 => Ok(Promotion::Rook),
+            _ => Err("fail to decode promotion from u32"),
+        }
     }
 }
 

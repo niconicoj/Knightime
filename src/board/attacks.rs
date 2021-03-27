@@ -1,7 +1,7 @@
 use crate::{
     bitboard::Bitboard,
     constants::*,
-    defs::{CastleRights, Piece, Side, Square},
+    defs::{CastleRights, Piece, Promotion, Side, Square},
 };
 
 use super::Board;
@@ -104,22 +104,22 @@ impl Board {
             print!(
                 "{}={} ",
                 SQUARE_NAME[target_square as usize],
-                UNICODE_PIECE[side as usize][Piece::Queen as usize]
+                UNICODE_PIECE[side as usize][Promotion::Queen as usize]
             );
             print!(
                 "{}={} ",
                 SQUARE_NAME[target_square as usize],
-                UNICODE_PIECE[side as usize][Piece::Rook as usize]
+                UNICODE_PIECE[side as usize][Promotion::Rook as usize]
             );
             print!(
                 "{}={} ",
                 SQUARE_NAME[target_square as usize],
-                UNICODE_PIECE[side as usize][Piece::Bishop as usize]
+                UNICODE_PIECE[side as usize][Promotion::Bishop as usize]
             );
             print!(
                 "{}={} ",
                 SQUARE_NAME[target_square as usize],
-                UNICODE_PIECE[side as usize][Piece::Knight as usize]
+                UNICODE_PIECE[side as usize][Promotion::Knight as usize]
             );
         } else {
             if !self.occupancies[2].get_square(target_square) {
@@ -159,25 +159,25 @@ impl Board {
                     "{}×{}={} ",
                     SQUARE_NAME[square as usize].chars().next().unwrap(),
                     SQUARE_NAME[target_square as usize],
-                    UNICODE_PIECE[side as usize][Piece::Queen as usize]
+                    UNICODE_PIECE[side as usize][Promotion::Queen as usize]
                 );
                 print!(
                     "{}×{}={} ",
                     SQUARE_NAME[square as usize].chars().next().unwrap(),
                     SQUARE_NAME[target_square as usize],
-                    UNICODE_PIECE[side as usize][Piece::Rook as usize]
+                    UNICODE_PIECE[side as usize][Promotion::Rook as usize]
                 );
                 print!(
                     "{}×{}={} ",
                     SQUARE_NAME[square as usize].chars().next().unwrap(),
                     SQUARE_NAME[target_square as usize],
-                    UNICODE_PIECE[side as usize][Piece::Bishop as usize]
+                    UNICODE_PIECE[side as usize][Promotion::Bishop as usize]
                 );
                 print!(
                     "{}×{}={} ",
                     SQUARE_NAME[square as usize].chars().next().unwrap(),
                     SQUARE_NAME[target_square as usize],
-                    UNICODE_PIECE[side as usize][Piece::Knight as usize]
+                    UNICODE_PIECE[side as usize][Promotion::Knight as usize]
                 );
             } else {
                 print!(

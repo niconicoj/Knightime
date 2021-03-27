@@ -6,9 +6,11 @@ use crate::{
     magic::{Magic, BISHOP_TABLE_SIZE, ROOK_TABLE_SIZE},
 };
 
+mod defs;
 mod generate;
 mod init;
 mod mask;
+pub mod movelist;
 
 pub struct MoveGenerator {
     white_pawns: Vec<Bitboard>,

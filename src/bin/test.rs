@@ -1,12 +1,30 @@
 extern crate knightime;
 
-use knightime::{board::Board, defs::Side};
+use knightime::{
+    board::Board,
+    constants::*,
+    defs::Side,
+    move_generator::{movelist::Move, MoveGenerator},
+};
 
 fn main() {
-    let board =
-        Board::from_fen("r3k2r/3b2bp/4p1p1/1p1p1pP1/P1nP1B2/3n1P2/p2N3P/1Q4KR w kq f6 0 23")
-            .unwrap();
-    println!("{}", board);
-    board.generate_moves(Side::White);
-    board.generate_moves(Side::Black);
+    let mv = Move::new(
+        E3,
+        F4,
+        knightime::defs::Piece::Pawn,
+        knightime::defs::Promotion::None,
+        true,
+        false,
+        true,
+        false,
+    );
+
+    println!("{}", SQUARE_NAME[mv.get_source_square() as usize]);
+    println!("{}", SQUARE_NAME[mv.get_target_square() as usize]);
+    println!("{:?}", mv.get_piece());
+    println!("{:?}", mv.get_promotion());
+    println!("{:?}", mv.get_capture());
+    println!("{:?}", mv.get_double_push());
+    println!("{:?}", mv.get_en_passant());
+    println!("{:?}", mv.get_caslting());
 }
