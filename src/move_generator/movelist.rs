@@ -1,4 +1,4 @@
-use std::convert::TryFrom;
+use std::{convert::TryFrom, hint::unreachable_unchecked};
 
 use crate::defs::{Piece, Promotion, Square};
 use crate::move_generator::defs::*;
@@ -37,11 +37,13 @@ impl Move {
     }
 
     pub fn get_piece(&self) -> Piece {
-        Piece::try_from((self.0 & PIECE_MASK) >> PIECE_SHIFT).unwrap()
+        Piece::try_from((self.0 & PIECE_MASK) >> PIECE_SHIFT)
+            .unwrap_or_else(|_| unsafe { unreachable_unchecked() })
     }
 
     pub fn get_promotion(&self) -> Promotion {
-        Promotion::try_from((self.0 & PROMOTION_MASK) >> PROMOTION_SHIFT).unwrap()
+        Promotion::try_from((self.0 & PROMOTION_MASK) >> PROMOTION_SHIFT)
+            .unwrap_or_else(|_| unsafe { unreachable_unchecked() })
     }
 
     pub fn get_capture(&self) -> bool {
