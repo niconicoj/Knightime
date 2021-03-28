@@ -8,23 +8,5 @@ use knightime::{
 };
 
 fn main() {
-    let mv = Move::new(
-        E3,
-        F4,
-        knightime::defs::Piece::Pawn,
-        knightime::defs::Promotion::None,
-        true,
-        false,
-        true,
-        false,
-    );
-
-    println!("{}", SQUARE_NAME[mv.get_source_square() as usize]);
-    println!("{}", SQUARE_NAME[mv.get_target_square() as usize]);
-    println!("{:?}", mv.get_piece());
-    println!("{:?}", mv.get_promotion());
-    println!("{:?}", mv.get_capture());
-    println!("{:?}", mv.get_double_push());
-    println!("{:?}", mv.get_en_passant());
-    println!("{:?}", mv.get_caslting());
+    let board = Board::from_fen("8/8/8/8/8/8/P7/8 w - - 0 1").unwrap();
 }

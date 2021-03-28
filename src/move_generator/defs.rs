@@ -7,7 +7,6 @@ pub const DOUBLE_PUSH_MASK: u32 = 0x200000;
 pub const EN_PASSANT_MASK: u32 = 0x400000;
 pub const CASTLING_MASK: u32 = 0x800000;
 
-pub const SOURCE_SQUARE_SHIFT: u32 = 0;
 pub const TARGET_SQUARE_SHIFT: u32 = 6;
 pub const PIECE_SHIFT: u32 = 12;
 pub const PROMOTION_SHIFT: u32 = 16;

@@ -2,6 +2,7 @@ use crate::{
     bitboard::Bitboard,
     constants::*,
     defs::{CastleRights, Piece, Promotion, Side, Square},
+    move_generator::movelist::{Move, MoveList},
 };
 
 use super::Board;
@@ -69,9 +70,9 @@ impl Board {
         false
     }
 
-    pub fn generate_moves(&self, side: Side) {
-        println!("moves for {} :", SIDE_NAME[side as usize]);
-        self.generate_pawn_moves(side);
+    pub fn generate_moves(&self, side: Side) -> MoveList {
+        let mut movelist = MoveList::new();
+        movelist.append_moves(&mut self.generate_pawn_moves(side));
         println!();
         self.generate_castling_moves(side);
         println!();
@@ -83,47 +84,40 @@ impl Board {
         println!();
         self.generate_rook_moves(side);
         println!();
+
+        movelist
     }
 
-    fn generate_pawn_moves(&self, side: Side) {
+    fn generate_pawn_moves(&self, side: Side) -> MoveList {
+        let mut movelist = MoveList::new();
         let bitboard = self.bitboards[side as usize][Piece::Pawn as usize];
 
         for square in bitboard.into_iter() {
-            self.generate_quiet_pawn_move(square, side);
-            self.generate_noisy_pawn_move(square, side);
+            movelist.append_moves(&mut self.generate_quiet_pawn_move(square, side));
+            movelist.append_moves(&mut self.generate_noisy_pawn_move(square, side));
         }
+        movelist
     }
 
-    fn generate_quiet_pawn_move(&self, square: Square, side: Side) {
+    fn generate_quiet_pawn_move(&self, square: Square, side: Side) -> MoveList {
+        let mut movelist = MoveList::new();
         let target_square = match side {
             Side::White => square + 8,
             Side::Black => square - 8,
         };
         if !(A2..=H7).contains(&target_square) {
-            // promotion happens
-            print!(
-                "{}={} ",
-                SQUARE_NAME[target_square as usize],
-                UNICODE_PIECE[side as usize][Promotion::Queen as usize]
-            );
-            print!(
-                "{}={} ",
-                SQUARE_NAME[target_square as usize],
-                UNICODE_PIECE[side as usize][Promotion::Rook as usize]
-            );
-            print!(
-                "{}={} ",
-                SQUARE_NAME[target_square as usize],
-                UNICODE_PIECE[side as usize][Promotion::Bishop as usize]
-            );
-            print!(
-                "{}={} ",
-                SQUARE_NAME[target_square as usize],
-                UNICODE_PIECE[side as usize][Promotion::Knight as usize]
-            );
+            #[rustfmt::skip]
+            movelist.add_move(Move::new(square, target_square, Piece::Pawn, Promotion::Queen, false, false, false, false,));
+            #[rustfmt::skip]
+            movelist.add_move(Move::new( square, target_square, Piece::Pawn, Promotion::Rook, false, false, false, false,));
+            #[rustfmt::skip]
+            movelist.add_move(Move::new( square, target_square, Piece::Pawn, Promotion::Bishop, false, false, false, false,));
+            #[rustfmt::skip]
+            movelist.add_move(Move::new( square, target_square, Piece::Pawn, Promotion::Knight, false, false, false, false,));
         } else {
             if !self.occupancies[2].get_square(target_square) {
-                print!("{} ", SQUARE_NAME[target_square as usize]);
+                #[rustfmt::skip]
+                movelist.add_move(Move::new( square, target_square, Piece::Pawn, Promotion::None, false, false, false, false,));
             }
             let two_squares_target = match side {
                 Side::White => square + 16,
@@ -132,59 +126,46 @@ impl Board {
             match side {
                 Side::White => {
                     if (A2..=H2).contains(&square)
+                        && !self.occupancies[2].get_square(target_square)
                         && !self.occupancies[2].get_square(two_squares_target)
                     {
-                        print!("{} ", SQUARE_NAME[two_squares_target as usize]);
+                        #[rustfmt::skip]
+                        movelist.add_move(Move::new( square, two_squares_target, Piece::Pawn, Promotion::None, false, true, false, false,));
                     }
                 }
                 Side::Black => {
                     if (A7..=H7).contains(&square)
+                        && !self.occupancies[2].get_square(target_square)
                         && !self.occupancies[2].get_square(two_squares_target)
                     {
-                        print!("{} ", SQUARE_NAME[two_squares_target as usize]);
+                        #[rustfmt::skip]
+                        movelist.add_move(Move::new( square, two_squares_target, Piece::Pawn, Promotion::None, false, true, false, false,));
                     }
                 }
             }
         }
+        movelist
     }
 
-    fn generate_noisy_pawn_move(&self, square: Square, side: Side) {
+    fn generate_noisy_pawn_move(&self, square: Square, side: Side) -> MoveList {
+        let mut movelist = MoveList::new();
         let attacks = self.move_generator.get_pawn_attacks(square, side)
             & self.occupancies[side.get_opposite_side() as usize];
 
         for target_square in attacks.into_iter() {
             if !(A2..=H7).contains(&target_square) {
                 // promotion happens
-                print!(
-                    "{}×{}={} ",
-                    SQUARE_NAME[square as usize].chars().next().unwrap(),
-                    SQUARE_NAME[target_square as usize],
-                    UNICODE_PIECE[side as usize][Promotion::Queen as usize]
-                );
-                print!(
-                    "{}×{}={} ",
-                    SQUARE_NAME[square as usize].chars().next().unwrap(),
-                    SQUARE_NAME[target_square as usize],
-                    UNICODE_PIECE[side as usize][Promotion::Rook as usize]
-                );
-                print!(
-                    "{}×{}={} ",
-                    SQUARE_NAME[square as usize].chars().next().unwrap(),
-                    SQUARE_NAME[target_square as usize],
-                    UNICODE_PIECE[side as usize][Promotion::Bishop as usize]
-                );
-                print!(
-                    "{}×{}={} ",
-                    SQUARE_NAME[square as usize].chars().next().unwrap(),
-                    SQUARE_NAME[target_square as usize],
-                    UNICODE_PIECE[side as usize][Promotion::Knight as usize]
-                );
+                #[rustfmt::skip]
+                movelist.add_move(Move::new( square, target_square, Piece::Pawn, Promotion::Queen, true, false, false, false,));
+                #[rustfmt::skip]
+                movelist.add_move(Move::new( square, target_square, Piece::Pawn, Promotion::Rook, true, false, false, false,));
+                #[rustfmt::skip]
+                movelist.add_move(Move::new( square, target_square, Piece::Pawn, Promotion::Bishop, true, false, false, false,));
+                #[rustfmt::skip]
+                movelist.add_move(Move::new( square, target_square, Piece::Pawn, Promotion::Knight, true, false, false, false,));
             } else {
-                print!(
-                    "{}×{} ",
-                    SQUARE_NAME[square as usize].chars().next().unwrap(),
-                    SQUARE_NAME[target_square as usize]
-                );
+                #[rustfmt::skip]
+                movelist.add_move(Move::new( square, target_square, Piece::Pawn, Promotion::None, true, false, false, false,));
             }
         }
         match self.en_passant_square {
@@ -193,15 +174,13 @@ impl Board {
                     & (Bitboard(1u64) << en_passant_square);
 
                 for target_square in en_passant_attacks.into_iter() {
-                    print!(
-                        "{}×{} ",
-                        SQUARE_NAME[square as usize].chars().next().unwrap(),
-                        SQUARE_NAME[target_square as usize]
-                    );
+                    #[rustfmt::skip]
+                    movelist.add_move(Move::new( square, target_square, Piece::Pawn, Promotion::None, true, false, true, false,));
                 }
             }
             None => {}
         }
+        movelist
     }
 
     fn generate_castling_moves(&self, side: Side) {
@@ -365,5 +344,44 @@ mod tests {
         assert_eq!(board.is_square_attacked(C6, Side::White), true);
         assert_eq!(board.is_square_attacked(E6, Side::White), true);
         assert_eq!(board.is_square_attacked(B6, Side::White), false);
+    }
+
+    #[test]
+    fn generate_simple_pawn_push_tests() {
+        let board = Board::from_fen("8/3p4/8/8/8/8/3P4/8 w - - 0 1").unwrap();
+        let pawn_moves = board.generate_quiet_pawn_move(D2, Side::White);
+        #[rustfmt::skip]
+        assert_eq!(
+            *pawn_moves.get(0).unwrap(),
+            Move::new(D2, D3, Piece::Pawn, Promotion::None, false, false, false, false)
+        );
+        #[rustfmt::skip]
+        assert_eq!(
+            *pawn_moves.get(1).unwrap(),
+            Move::new(D2, D4, Piece::Pawn, Promotion::None, false, true, false, false)
+        );
+        assert_eq!(pawn_moves.get(2), None);
+        let pawn_moves = board.generate_quiet_pawn_move(D7, Side::Black);
+        println!("{}", pawn_moves);
+        #[rustfmt::skip]
+        assert_eq!(
+            *pawn_moves.get(0).unwrap(),
+            Move::new(D7, D6, Piece::Pawn, Promotion::None, false, false, false, false)
+        );
+        #[rustfmt::skip]
+        assert_eq!(
+            *pawn_moves.get(1).unwrap(),
+            Move::new(D7, D5, Piece::Pawn, Promotion::None, false, true, false, false)
+        );
+        assert_eq!(pawn_moves.get(2), None);
+    }
+
+    #[test]
+    fn generate_blocked_pawn_push_tests() {
+        let board = Board::from_fen("8/3p4/3B4/8/8/3b4/3P4/8 w - - 0 1").unwrap();
+        let pawn_moves = board.generate_quiet_pawn_move(D2, Side::White);
+        assert_eq!(pawn_moves.get(0), None);
+        let pawn_moves = board.generate_quiet_pawn_move(D7, Side::Black);
+        assert_eq!(pawn_moves.get(0), None);
     }
 }

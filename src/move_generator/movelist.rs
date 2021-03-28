@@ -1,9 +1,70 @@
-use std::{convert::TryFrom, hint::unreachable_unchecked};
+use std::{convert::TryFrom, fmt, hint::unreachable_unchecked};
 
+use crate::constants::{SQUARE_NAME, UNICODE_PIECE};
 use crate::defs::{Piece, Promotion, Square};
 use crate::move_generator::defs::*;
 
+#[derive(Debug)]
+pub struct MoveList(Vec<Move>);
+
+impl fmt::Display for MoveList {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        for mv in &self.0 {
+            write!(f, "{} ", mv)?;
+        }
+        Ok(())
+    }
+}
+
+impl MoveList {
+    pub fn new() -> Self {
+        Self(vec![])
+    }
+
+    pub fn get(&self, index: usize) -> Option<&Move> {
+        self.0.get(index)
+    }
+
+    pub fn add_move(&mut self, mv: Move) {
+        self.0.push(mv);
+    }
+
+    pub fn append_moves(&mut self, movelist: &mut MoveList) {
+        self.0.append(&mut movelist.0);
+    }
+}
+
+#[derive(Debug)]
 pub struct Move(u32);
+
+impl fmt::Display for Move {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self.get_piece() {
+            Piece::Pawn => {}
+            _ => {
+                write!(f, "{}", UNICODE_PIECE[0][self.get_piece() as usize])?;
+            }
+        };
+        write!(f, "{}", SQUARE_NAME[self.get_source_square() as usize])?;
+        if self.get_capture() {
+            write!(f, "x")?;
+        }
+        write!(f, "{}", SQUARE_NAME[self.get_target_square() as usize])?;
+        match self.get_promotion() {
+            Promotion::None => {}
+            _ => {
+                write!(f, "={}", UNICODE_PIECE[0][self.get_promotion() as usize])?;
+            }
+        }
+        Ok(())
+    }
+}
+
+impl PartialEq for Move {
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0
+    }
+}
 
 impl Move {
     pub fn new(
