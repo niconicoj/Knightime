@@ -105,7 +105,7 @@ impl Board {
             Side::White => square + 8,
             Side::Black => square - 8,
         };
-        if !(A2..=H7).contains(&target_square) {
+        if !(A2..=H7).contains(&target_square) && !self.occupancies[2].get_square(target_square) {
             #[rustfmt::skip]
             movelist.add_move(Move::new(square, target_square, Piece::Pawn, Promotion::Queen, false, false, false, false,));
             #[rustfmt::skip]
@@ -183,11 +183,12 @@ impl Board {
         movelist
     }
 
-    fn generate_castling_moves(&self, side: Side) {
-        self.generate_castling_move(side, self.castling_rights[side as usize]);
+    fn generate_castling_moves(&self, side: Side) -> MoveList {
+        self.generate_castling_move(side, self.castling_rights[side as usize])
     }
 
-    fn generate_castling_move(&self, side: Side, castle: CastleRights) {
+    fn generate_castling_move(&self, side: Side, castle: CastleRights) -> MoveList {
+        let mut movelist = MoveList::new();
         match castle {
             CastleRights::None => {}
             CastleRights::KingSide => {
@@ -199,7 +200,16 @@ impl Board {
                     && (!self.is_square_attacked(blockers.1 .0, side.get_opposite_side()))
                     && (!self.is_square_attacked(blockers.1 .1, side.get_opposite_side()))
                 {
-                    print!("O-O ");
+                    movelist.add_move(Move::new(
+                        CASTLE_SQUARE[side as usize][(castle as usize) - 1].0,
+                        CASTLE_SQUARE[side as usize][(castle as usize) - 1].1,
+                        Piece::King,
+                        Promotion::None,
+                        false,
+                        false,
+                        false,
+                        true,
+                    ));
                 }
             }
             CastleRights::QueenSide => {
@@ -211,14 +221,26 @@ impl Board {
                     && (!self.is_square_attacked(blockers.1 .0, side.get_opposite_side()))
                     && (!self.is_square_attacked(blockers.1 .1, side.get_opposite_side()))
                 {
-                    print!("O-O-O ");
+                    movelist.add_move(Move::new(
+                        CASTLE_SQUARE[side as usize][(castle as usize) - 1].0,
+                        CASTLE_SQUARE[side as usize][(castle as usize) - 1].1,
+                        Piece::King,
+                        Promotion::None,
+                        false,
+                        false,
+                        false,
+                        true,
+                    ));
                 }
             }
             CastleRights::Both => {
-                self.generate_castling_move(side, CastleRights::KingSide);
-                self.generate_castling_move(side, CastleRights::QueenSide);
+                movelist
+                    .append_moves(&mut self.generate_castling_move(side, CastleRights::KingSide));
+                movelist
+                    .append_moves(&mut self.generate_castling_move(side, CastleRights::QueenSide));
             }
         }
+        movelist
     }
 
     fn generate_knight_moves(&self, side: Side) {
@@ -377,11 +399,130 @@ mod tests {
     }
 
     #[test]
+    fn generate_pawn_capture_moves_tests() {
+        let board = Board::from_fen("3k2r1/5P2/8/6Pp/8/1p1p4/2P1P3/3K4 w - h6 0 1").unwrap();
+        let pawn_moves = board.generate_noisy_pawn_move(C2, Side::White);
+        #[rustfmt::skip]
+        assert_eq!(
+            *pawn_moves.get(0).unwrap(),
+            Move::new(C2, B3, Piece::Pawn, Promotion::None, true, false, false, false)
+        );
+        #[rustfmt::skip]
+        assert_eq!(
+            *pawn_moves.get(1).unwrap(),
+            Move::new(C2, D3, Piece::Pawn, Promotion::None, true, false, false, false)
+        );
+        assert_eq!(pawn_moves.get(2), None);
+        let pawn_moves = board.generate_noisy_pawn_move(E2, Side::White);
+        println!("{}", pawn_moves);
+        #[rustfmt::skip]
+        assert_eq!(
+            *pawn_moves.get(0).unwrap(),
+            Move::new(E2, D3, Piece::Pawn, Promotion::None, true, false, false, false)
+        );
+        assert_eq!(pawn_moves.get(1), None);
+        let pawn_moves = board.generate_noisy_pawn_move(G5, Side::White);
+        #[rustfmt::skip]
+        assert_eq!(
+            *pawn_moves.get(0).unwrap(),
+            Move::new(G5, H6, Piece::Pawn, Promotion::None, true, false, true, false)
+        );
+        assert_eq!(pawn_moves.get(2), None);
+        let pawn_moves = board.generate_noisy_pawn_move(F7, Side::White);
+        #[rustfmt::skip]
+        assert_eq!(
+            *pawn_moves.get(0).unwrap(),
+            Move::new(F7, G8, Piece::Pawn, Promotion::Queen, true, false, false, false)
+        );
+        #[rustfmt::skip]
+        assert_eq!(
+            *pawn_moves.get(1).unwrap(),
+            Move::new(F7, G8, Piece::Pawn, Promotion::Rook, true, false, false, false)
+        );
+        #[rustfmt::skip]
+        assert_eq!(
+            *pawn_moves.get(2).unwrap(),
+            Move::new(F7, G8, Piece::Pawn, Promotion::Bishop, true, false, false, false)
+        );
+        #[rustfmt::skip]
+        assert_eq!(
+            *pawn_moves.get(3).unwrap(),
+            Move::new(F7, G8, Piece::Pawn, Promotion::Knight, true, false, false, false)
+        );
+        assert_eq!(pawn_moves.get(4), None);
+    }
+
+    #[test]
+    fn generate_pawn_push_promotion_tests() {
+        let board = Board::from_fen("1k6/1P1pP3/8/8/8/8/3P1K2/8 w - - 0 1").unwrap();
+        let pawn_moves = board.generate_quiet_pawn_move(E7, Side::White);
+        #[rustfmt::skip]
+        assert_eq!(
+            *pawn_moves.get(0).unwrap(),
+            Move::new(E7, E8, Piece::Pawn, Promotion::Queen, false, false, false, false)
+        );
+        #[rustfmt::skip]
+        assert_eq!(
+            *pawn_moves.get(1).unwrap(),
+            Move::new(E7, E8, Piece::Pawn, Promotion::Rook, false, false, false, false)
+        );
+        #[rustfmt::skip]
+        assert_eq!(
+            *pawn_moves.get(2).unwrap(),
+            Move::new(E7, E8, Piece::Pawn, Promotion::Bishop, false, false, false, false)
+        );
+        #[rustfmt::skip]
+        assert_eq!(
+            *pawn_moves.get(3).unwrap(),
+            Move::new(E7, E8, Piece::Pawn, Promotion::Knight, false, false, false, false)
+        );
+        assert_eq!(pawn_moves.get(4), None);
+        let pawn_moves = board.generate_quiet_pawn_move(B7, Side::White);
+        println!("{}", pawn_moves);
+        assert_eq!(pawn_moves.get(0), None);
+    }
+
+    #[test]
     fn generate_blocked_pawn_push_tests() {
         let board = Board::from_fen("8/3p4/3B4/8/8/3b4/3P4/8 w - - 0 1").unwrap();
         let pawn_moves = board.generate_quiet_pawn_move(D2, Side::White);
         assert_eq!(pawn_moves.get(0), None);
         let pawn_moves = board.generate_quiet_pawn_move(D7, Side::Black);
         assert_eq!(pawn_moves.get(0), None);
+    }
+
+    #[test]
+    fn generate_castling_move_tests() {
+        // White is in check in this position and should not be able to castle, black on the other hand can castle king side.
+        let board =
+            Board::from_fen("r1bqk2r/ppp2ppp/2n1pn2/3p4/1b1P4/3BPN2/PPP2PPP/RNBQK2R w KQkq - 0 1")
+                .unwrap();
+        let castling_moves = board.generate_castling_moves(Side::White);
+        assert_eq!(castling_moves.get(0), None);
+        let castling_moves = board.generate_castling_moves(Side::Black);
+        #[rustfmt::skip]
+        assert_eq!(
+            *castling_moves.get(0).unwrap(),
+            Move::new(E8, G8, Piece::King, Promotion::None, false, false, false, true)
+        );
+        assert_eq!(castling_moves.get(1), None);
+        // here black is in check, but white can castle both sides
+        let board =
+            Board::from_fen("rnb1kbnr/ppp3pp/5p2/1BqpP1B1/8/2N1PN2/PPP1QPPP/R3K2R w KQkq - 0 1")
+                .unwrap();
+        let castling_moves = board.generate_castling_moves(Side::White);
+        #[rustfmt::skip]
+        assert_eq!(
+            *castling_moves.get(0).unwrap(),
+            Move::new(E1, G1, Piece::King, Promotion::None, false, false, false, true)
+        );
+        #[rustfmt::skip]
+        assert_eq!(
+            *castling_moves.get(1).unwrap(),
+            Move::new(E1, C1, Piece::King, Promotion::None, false, false, false, true)
+        );
+        assert_eq!(castling_moves.get(2), None);
+        let castling_moves = board.generate_castling_moves(Side::Black);
+        assert_eq!(castling_moves.get(1), None);
     }
 }

@@ -91,6 +91,8 @@ pub const ASCII_PIECE: [[&str; 6]; 2] = [
     ["k", "q", "p", "n", "b", "r"],
 ];
 
+pub const CASTLE_SQUARE: [[(Square, Square); 2]; 2] = [[(E1, G1), (E1, C1)], [(E8, G8), (E8, C8)]];
+
 pub const FILE_A: u64 = 0x0101010101010101;
 pub const FILE_AB: u64 = 0x0303030303030303;
 pub const FILE_H: u64 = 0x8080808080808080;
