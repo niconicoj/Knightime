@@ -243,57 +243,82 @@ impl Board {
         movelist
     }
 
-    fn generate_knight_moves(&self, side: Side) {
+    fn generate_knight_moves(&self, side: Side) -> MoveList {
+        let mut movelist = MoveList::new();
         for square in self.bitboards[side as usize][Piece::Knight as usize].into_iter() {
             let quiet_moves = self.move_generator.get_knight_attacks(square) & !self.occupancies[2];
 
             for target_square in quiet_moves.into_iter() {
-                print!(
-                    "{}{} ",
-                    UNICODE_PIECE[side as usize][Piece::Knight as usize],
-                    SQUARE_NAME[target_square as usize],
-                );
+                movelist.add_move(Move::new(
+                    square,
+                    target_square,
+                    Piece::Knight,
+                    Promotion::None,
+                    false,
+                    false,
+                    false,
+                    false,
+                ));
             }
 
             let captures = self.move_generator.get_knight_attacks(square)
                 & self.occupancies[side.get_opposite_side() as usize];
 
             for target_square in captures.into_iter() {
-                print!(
-                    "{}×{} ",
-                    UNICODE_PIECE[side as usize][Piece::Knight as usize],
-                    SQUARE_NAME[target_square as usize],
-                );
+                movelist.add_move(Move::new(
+                    square,
+                    target_square,
+                    Piece::Knight,
+                    Promotion::None,
+                    true,
+                    false,
+                    false,
+                    false,
+                ));
             }
         }
+        movelist
     }
 
-    fn generate_king_moves(&self, side: Side) {
+    fn generate_king_moves(&self, side: Side) -> MoveList {
+        let mut movelist = MoveList::new();
         for square in self.bitboards[side as usize][Piece::King as usize].into_iter() {
             let quiet_moves = self.move_generator.get_king_attacks(square) & !self.occupancies[2];
 
             for target_square in quiet_moves.into_iter() {
-                print!(
-                    "{}{} ",
-                    UNICODE_PIECE[side as usize][Piece::King as usize],
-                    SQUARE_NAME[target_square as usize],
-                );
+                movelist.add_move(Move::new(
+                    square,
+                    target_square,
+                    Piece::King,
+                    Promotion::None,
+                    false,
+                    false,
+                    false,
+                    false,
+                ));
             }
 
             let captures = self.move_generator.get_king_attacks(square)
                 & self.occupancies[side.get_opposite_side() as usize];
 
             for target_square in captures.into_iter() {
-                print!(
-                    "{}×{} ",
-                    UNICODE_PIECE[side as usize][Piece::King as usize],
-                    SQUARE_NAME[target_square as usize],
-                );
+                movelist.add_move(Move::new(
+                    square,
+                    target_square,
+                    Piece::King,
+                    Promotion::None,
+                    true,
+                    false,
+                    false,
+                    false,
+                ));
             }
         }
+        movelist
     }
 
-    fn generate_bishop_moves(&self, side: Side) {
+    fn generate_bishop_moves(&self, side: Side) -> MoveList {
+        let mut movelist = MoveList::new();
         for square in self.bitboards[side as usize][Piece::Bishop as usize].into_iter() {
             let quiet_moves = self
                 .move_generator
@@ -301,11 +326,16 @@ impl Board {
                 & !self.occupancies[2];
 
             for target_square in quiet_moves.into_iter() {
-                print!(
-                    "{}{} ",
-                    UNICODE_PIECE[side as usize][Piece::Bishop as usize],
-                    SQUARE_NAME[target_square as usize],
-                );
+                movelist.add_move(Move::new(
+                    square,
+                    target_square,
+                    Piece::Bishop,
+                    Promotion::None,
+                    false,
+                    false,
+                    false,
+                    false,
+                ));
             }
 
             let captures = self
@@ -314,16 +344,23 @@ impl Board {
                 & self.occupancies[side.get_opposite_side() as usize];
 
             for target_square in captures.into_iter() {
-                print!(
-                    "{}×{} ",
-                    UNICODE_PIECE[side as usize][Piece::Bishop as usize],
-                    SQUARE_NAME[target_square as usize],
-                );
+                movelist.add_move(Move::new(
+                    square,
+                    target_square,
+                    Piece::Bishop,
+                    Promotion::None,
+                    true,
+                    false,
+                    false,
+                    false,
+                ));
             }
         }
+        movelist
     }
 
-    fn generate_rook_moves(&self, side: Side) {
+    fn generate_rook_moves(&self, side: Side) -> MoveList {
+        let mut movelist = MoveList::new();
         for square in self.bitboards[side as usize][Piece::Rook as usize].into_iter() {
             let quiet_moves = self
                 .move_generator
@@ -331,11 +368,16 @@ impl Board {
                 & !self.occupancies[2];
 
             for target_square in quiet_moves.into_iter() {
-                print!(
-                    "{}{} ",
-                    UNICODE_PIECE[side as usize][Piece::Rook as usize],
-                    SQUARE_NAME[target_square as usize],
-                );
+                movelist.add_move(Move::new(
+                    square,
+                    target_square,
+                    Piece::Rook,
+                    Promotion::None,
+                    false,
+                    false,
+                    false,
+                    false,
+                ));
             }
 
             let captures = self
@@ -344,13 +386,61 @@ impl Board {
                 & self.occupancies[side.get_opposite_side() as usize];
 
             for target_square in captures.into_iter() {
-                print!(
-                    "{}×{} ",
-                    UNICODE_PIECE[side as usize][Piece::Rook as usize],
-                    SQUARE_NAME[target_square as usize],
-                );
+                movelist.add_move(Move::new(
+                    square,
+                    target_square,
+                    Piece::Rook,
+                    Promotion::None,
+                    true,
+                    false,
+                    false,
+                    false,
+                ));
             }
         }
+        movelist
+    }
+
+    pub fn generate_queen_moves(&self, side: Side) -> MoveList {
+        let mut movelist = MoveList::new();
+        for square in self.bitboards[side as usize][Piece::Queen as usize].into_iter() {
+            let quiet_moves = self
+                .move_generator
+                .get_queen_attacks(square, self.occupancies[2])
+                & !self.occupancies[2];
+
+            for target_square in quiet_moves.into_iter() {
+                movelist.add_move(Move::new(
+                    square,
+                    target_square,
+                    Piece::Queen,
+                    Promotion::None,
+                    false,
+                    false,
+                    false,
+                    false,
+                ));
+            }
+
+            let captures = self
+                .move_generator
+                .get_queen_attacks(square, self.occupancies[2])
+                & self.occupancies[side.get_opposite_side() as usize];
+
+            for target_square in captures.into_iter() {
+                movelist.add_move(Move::new(
+                    square,
+                    target_square,
+                    Piece::Queen,
+                    Promotion::None,
+                    true,
+                    false,
+                    false,
+                    false,
+                ));
+            }
+        }
+        movelist
     }
 }
 
@@ -373,15 +463,15 @@ mod tests {
         let board = Board::from_fen("8/3p4/8/8/8/8/3P4/8 w - - 0 1").unwrap();
         let pawn_moves = board.generate_quiet_pawn_move(D2, Side::White);
         #[rustfmt::skip]
-        assert_eq!(
-            *pawn_moves.get(0).unwrap(),
+        assert!(
+            pawn_moves.contains(
             Move::new(D2, D3, Piece::Pawn, Promotion::None, false, false, false, false)
-        );
+        ));
         #[rustfmt::skip]
-        assert_eq!(
-            *pawn_moves.get(1).unwrap(),
+        assert!(
+            pawn_moves.contains(
             Move::new(D2, D4, Piece::Pawn, Promotion::None, false, true, false, false)
-        );
+        ));
         assert_eq!(pawn_moves.get(2), None);
         let pawn_moves = board.generate_quiet_pawn_move(D7, Side::Black);
         println!("{}", pawn_moves);
@@ -524,5 +614,189 @@ mod tests {
         assert_eq!(castling_moves.get(2), None);
         let castling_moves = board.generate_castling_moves(Side::Black);
         assert_eq!(castling_moves.get(1), None);
+
+        let board =
+            Board::from_fen("rnb1kbnr/ppp3pp/5p2/1BqpP1B1/8/2N1PN2/PPP1QPPP/R3K2R w - - 0 1")
+                .unwrap();
+        let castling_moves = board.generate_castling_moves(Side::White);
+        assert_eq!(castling_moves.get(0), None);
+        let castling_moves = board.generate_castling_moves(Side::Black);
+        assert_eq!(castling_moves.get(0), None);
+    }
+
+    #[test]
+    fn generate_knight_moves_tests() {
+        let board = Board::from_fen("8/8/5p2/2P5/4N3/6p1/5P2/8 w - - 0 1").unwrap();
+        let knight_moves = board.generate_knight_moves(Side::White);
+        #[rustfmt::skip]
+        assert!(knight_moves.contains(
+            Move::new(E4, D2, Piece::Knight, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(knight_moves.contains(
+            Move::new(E4, C3, Piece::Knight, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(knight_moves.contains(
+            Move::new(E4, D6, Piece::Knight, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(knight_moves.contains(
+            Move::new(E4, G5, Piece::Knight, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(knight_moves.contains(
+            Move::new(E4, G3, Piece::Knight, Promotion::None, true, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(knight_moves.contains(
+            Move::new(E4, F6, Piece::Knight, Promotion::None, true, false, false, false)
+        ));
+        println!("{}", knight_moves);
+        assert_eq!(knight_moves.len(), 6);
+    }
+
+    #[test]
+    fn generate_king_moves_tests() {
+        let board = Board::from_fen("8/8/8/4n3/2pK4/2P1R3/8/8 w - - 0 1").unwrap();
+        let king_moves = board.generate_king_moves(Side::White);
+        #[rustfmt::skip]
+        assert!(king_moves.contains(
+            Move::new(D4, D5, Piece::King, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(king_moves.contains(
+            Move::new(D4, E4, Piece::King, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(king_moves.contains(
+            Move::new(D4, D3, Piece::King, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(king_moves.contains(
+            Move::new(D4, C5, Piece::King, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(king_moves.contains(
+            Move::new(D4, E5, Piece::King, Promotion::None, true, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(king_moves.contains(
+            Move::new(D4, C4, Piece::King, Promotion::None, true, false, false, false)
+        ));
+        assert_eq!(king_moves.len(), 6);
+    }
+
+    #[test]
+    fn generate_bishop_moves_tests() {
+        let board = Board::from_fen("8/8/2n5/7p/8/5B2/4P3/8 w - - 0 1").unwrap();
+        let bishop_moves = board.generate_bishop_moves(Side::White);
+        #[rustfmt::skip]
+        assert!(bishop_moves.contains(
+            Move::new(F3, G2, Piece::Bishop, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(bishop_moves.contains(
+            Move::new(F3, H1, Piece::Bishop, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(bishop_moves.contains(
+            Move::new(F3, G4, Piece::Bishop, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(bishop_moves.contains(
+            Move::new(F3, E4, Piece::Bishop, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(bishop_moves.contains(
+            Move::new(F3, D5, Piece::Bishop, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(bishop_moves.contains(
+            Move::new(F3, C6, Piece::Bishop, Promotion::None, true, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(bishop_moves.contains(
+            Move::new(F3, H5, Piece::Bishop, Promotion::None, true, false, false, false)
+        ));
+        assert_eq!(bishop_moves.len(), 7);
+    }
+
+    #[test]
+    fn generate_rook_moves_tests() {
+        let board = Board::from_fen("8/8/5n2/8/8/3P1R1p/8/8 w - - 0 1").unwrap();
+        let rook_moves = board.generate_rook_moves(Side::White);
+        #[rustfmt::skip]
+        assert!(rook_moves.contains(
+            Move::new(F3, E3, Piece::Rook, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(rook_moves.contains(
+            Move::new(F3, G3, Piece::Rook, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(rook_moves.contains(
+            Move::new(F3, F2, Piece::Rook, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(rook_moves.contains(
+            Move::new(F3, F1, Piece::Rook, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(rook_moves.contains(
+            Move::new(F3, F4, Piece::Rook, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(rook_moves.contains(
+            Move::new(F3, F5, Piece::Rook, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(rook_moves.contains(
+            Move::new(F3, F6, Piece::Rook, Promotion::None, true, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(rook_moves.contains(
+            Move::new(F3, H3, Piece::Rook, Promotion::None, true, false, false, false)
+        ));
+        assert_eq!(rook_moves.len(), 8);
+    }
+
+    #[test]
+    fn generate_queen_moves_tests() {
+        let board = Board::from_fen("8/8/8/6P1/4n3/8/5PQr/8 w - - 0 1").unwrap();
+        let queen_moves = board.generate_queen_moves(Side::White);
+        #[rustfmt::skip]
+        assert!(queen_moves.contains(
+            Move::new(G2, G1, Piece::Queen, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(queen_moves.contains(
+            Move::new(G2, G3, Piece::Queen, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(queen_moves.contains(
+            Move::new(G2, G4, Piece::Queen, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(queen_moves.contains(
+            Move::new(G2, H3, Piece::Queen, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(queen_moves.contains(
+            Move::new(G2, F1, Piece::Queen, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(queen_moves.contains(
+            Move::new(G2, F3, Piece::Queen, Promotion::None, false, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(queen_moves.contains(
+            Move::new(G2, H2, Piece::Queen, Promotion::None, true, false, false, false)
+        ));
+        #[rustfmt::skip]
+        assert!(queen_moves.contains(
+            Move::new(G2, E4, Piece::Queen, Promotion::None, true, false, false, false)
+        ));
+        assert_eq!(queen_moves.len(), 9);
     }
 }

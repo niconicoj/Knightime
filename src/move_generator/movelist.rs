@@ -32,6 +32,14 @@ impl MoveList {
     pub fn append_moves(&mut self, movelist: &mut MoveList) {
         self.0.append(&mut movelist.0);
     }
+
+    pub fn contains(&self, mv: Move) -> bool {
+        self.0.contains(&mv)
+    }
+
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
 }
 
 #[derive(Debug)]
