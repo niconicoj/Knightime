@@ -94,5 +94,8 @@ impl Board {
         self.state.castling_rights[self.state.side_to_move as usize] = self.state.castling_rights
             [self.state.side_to_move as usize]
             & CASTLING_RIGHTS_UPDATE_TABLE[mv.get_source_square() as usize];
+        self.state.castling_rights[self.state.side_to_move as usize] = self.state.castling_rights
+            [self.state.side_to_move as usize]
+            & CASTLING_RIGHTS_UPDATE_TABLE[mv.get_target_square() as usize];
     }
 }
