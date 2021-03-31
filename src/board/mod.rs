@@ -1,6 +1,7 @@
 mod attacks;
 mod constants;
 mod defs;
+mod make;
 
 use std::fmt;
 
@@ -18,30 +19,38 @@ use self::{
     defs::ParseFenError,
 };
 
+#[derive(Clone, Copy)]
+pub struct BoardState {
+    pub bitboards: [[Bitboard; 6]; 2],
+    pub occupancies: [Bitboard; 3],
+    pub side_to_move: Side,
+    pub en_passant_square: Option<Square>,
+    pub castling_rights: [CastleRights; 2],
+}
+
+pub type BoardHistory = Vec<BoardState>;
+
 pub struct Board {
-    bitboards: [[Bitboard; 6]; 2],
-    occupancies: [Bitboard; 3],
-    side_to_move: Side,
-    en_passant_square: Option<Square>,
-    castling_rights: [CastleRights; 2],
+    state: BoardState,
+    history: BoardHistory,
     move_generator: MoveGenerator,
 }
 
 impl fmt::Display for Board {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let side_to_move = match self.side_to_move {
+        let side_to_move = match self.state.side_to_move {
             Side::White => "white",
             Side::Black => "black",
         };
-        let en_passant_square = match self.en_passant_square {
+        let en_passant_square = match self.state.en_passant_square {
             Some(square) => SQUARE_NAME[square as usize],
             None => "none",
         };
 
         let castling_rights = format!(
             "{} {}",
-            self.castling_rights[0].to_string(Side::White),
-            self.castling_rights[1].to_string(Side::Black)
+            self.state.castling_rights[0].to_string(Side::White),
+            self.state.castling_rights[1].to_string(Side::Black)
         );
         writeln!(f)?;
         for rank in (0u64..8u64).rev() {
@@ -52,7 +61,7 @@ impl fmt::Display for Board {
 
                 let mut occupied = false;
                 let square = (rank * 8 + file) as Square;
-                for (side, bitboards) in self.bitboards.iter().enumerate() {
+                for (side, bitboards) in self.state.bitboards.iter().enumerate() {
                     for (piece, bitboard) in bitboards.iter().enumerate() {
                         if bitboard.get_square(square) {
                             occupied = true;
@@ -82,11 +91,14 @@ impl fmt::Display for Board {
 impl Board {
     pub fn default() -> Self {
         Self {
-            bitboards: [INITIAL_WHITE_POSITIONS, INITIAL_BLACK_POSITIONS],
-            side_to_move: Side::White,
-            occupancies: INITIAL_OCCUPANCIES,
-            en_passant_square: None,
-            castling_rights: [CastleRights::Both; 2],
+            state: BoardState {
+                bitboards: [INITIAL_WHITE_POSITIONS, INITIAL_BLACK_POSITIONS],
+                side_to_move: Side::White,
+                occupancies: INITIAL_OCCUPANCIES,
+                en_passant_square: None,
+                castling_rights: [CastleRights::Both; 2],
+            },
+            history: vec![],
             move_generator: MoveGenerator::new(),
         }
     }
@@ -106,11 +118,14 @@ impl Board {
         let en_passant_square = Self::parse_fen_en_passant_square(fen_parts[3])?;
 
         Ok(Self {
-            bitboards: bitboards,
-            occupancies: Self::compute_occupancies(bitboards),
-            side_to_move: side_to_move,
-            en_passant_square: en_passant_square,
-            castling_rights: castling_rights,
+            state: BoardState {
+                bitboards: bitboards,
+                occupancies: Self::compute_occupancies(bitboards),
+                side_to_move: side_to_move,
+                en_passant_square: en_passant_square,
+                castling_rights: castling_rights,
+            },
+            history: vec![],
             move_generator: MoveGenerator::new(),
         })
     }
@@ -243,6 +258,19 @@ impl Board {
             };
         }
         Ok(Some(rank * 8 + file))
+    }
+
+    fn store_state(&mut self) {
+        self.history.push(BoardState {
+            bitboards: self.state.bitboards,
+            occupancies: self.state.occupancies,
+            side_to_move: self.state.side_to_move,
+            en_passant_square: self.state.en_passant_square,
+            castling_rights: self.state.castling_rights,
+        });
+    }
+    pub fn take_back_move(&mut self) {
+        self.state = self.history.pop().unwrap_or(self.state);
     }
 }
 

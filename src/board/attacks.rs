@@ -19,7 +19,7 @@ impl Board {
     }
 
     pub fn is_square_attacked(&self, square: Square, side: Side) -> bool {
-        if (self.bitboards[side as usize][Piece::Pawn as usize]
+        if (self.state.bitboards[side as usize][Piece::Pawn as usize]
             & self
                 .move_generator
                 .get_pawn_attacks(square, side.get_opposite_side()))
@@ -27,41 +27,41 @@ impl Board {
         {
             return true;
         }
-        if (self.bitboards[side as usize][Piece::Knight as usize]
+        if (self.state.bitboards[side as usize][Piece::Knight as usize]
             & self.move_generator.get_knight_attacks(square))
             != 0
         {
             return true;
         }
-        if (self.bitboards[side as usize][Piece::King as usize]
+        if (self.state.bitboards[side as usize][Piece::King as usize]
             & self.move_generator.get_king_attacks(square))
             != 0
         {
             return true;
         }
 
-        if (self.bitboards[side as usize][Piece::Bishop as usize]
+        if (self.state.bitboards[side as usize][Piece::Bishop as usize]
             & self
                 .move_generator
-                .get_bishop_attacks(square, self.occupancies[2]))
+                .get_bishop_attacks(square, self.state.occupancies[2]))
             != 0
         {
             return true;
         }
 
-        if (self.bitboards[side as usize][Piece::Rook as usize]
+        if (self.state.bitboards[side as usize][Piece::Rook as usize]
             & self
                 .move_generator
-                .get_rook_attacks(square, self.occupancies[2]))
+                .get_rook_attacks(square, self.state.occupancies[2]))
             != 0
         {
             return true;
         }
 
-        if (self.bitboards[side as usize][Piece::Queen as usize]
+        if (self.state.bitboards[side as usize][Piece::Queen as usize]
             & self
                 .move_generator
-                .get_queen_attacks(square, self.occupancies[2]))
+                .get_queen_attacks(square, self.state.occupancies[2]))
             != 0
         {
             return true;
@@ -70,27 +70,23 @@ impl Board {
         false
     }
 
-    pub fn generate_moves(&self, side: Side) -> MoveList {
+    pub fn generate_moves(&self) -> MoveList {
+        let side = self.state.side_to_move;
         let mut movelist = MoveList::new();
         movelist.append_moves(&mut self.generate_pawn_moves(side));
-        println!();
-        self.generate_castling_moves(side);
-        println!();
-        self.generate_knight_moves(side);
-        println!();
-        self.generate_king_moves(side);
-        println!();
-        self.generate_bishop_moves(side);
-        println!();
-        self.generate_rook_moves(side);
-        println!();
+        movelist.append_moves(&mut self.generate_castling_moves(side));
+        movelist.append_moves(&mut self.generate_knight_moves(side));
+        movelist.append_moves(&mut self.generate_king_moves(side));
+        movelist.append_moves(&mut self.generate_bishop_moves(side));
+        movelist.append_moves(&mut self.generate_rook_moves(side));
+        movelist.append_moves(&mut self.generate_queen_moves(side));
 
         movelist
     }
 
     fn generate_pawn_moves(&self, side: Side) -> MoveList {
         let mut movelist = MoveList::new();
-        let bitboard = self.bitboards[side as usize][Piece::Pawn as usize];
+        let bitboard = self.state.bitboards[side as usize][Piece::Pawn as usize];
 
         for square in bitboard.into_iter() {
             movelist.append_moves(&mut self.generate_quiet_pawn_move(square, side));
@@ -105,7 +101,9 @@ impl Board {
             Side::White => square + 8,
             Side::Black => square - 8,
         };
-        if !(A2..=H7).contains(&target_square) && !self.occupancies[2].get_square(target_square) {
+        if !(A2..=H7).contains(&target_square)
+            && !self.state.occupancies[2].get_square(target_square)
+        {
             #[rustfmt::skip]
             movelist.add_move(Move::new(square, target_square, Piece::Pawn, Promotion::Queen, false, false, false, false,));
             #[rustfmt::skip]
@@ -115,7 +113,7 @@ impl Board {
             #[rustfmt::skip]
             movelist.add_move(Move::new( square, target_square, Piece::Pawn, Promotion::Knight, false, false, false, false,));
         } else {
-            if !self.occupancies[2].get_square(target_square) {
+            if !self.state.occupancies[2].get_square(target_square) {
                 #[rustfmt::skip]
                 movelist.add_move(Move::new( square, target_square, Piece::Pawn, Promotion::None, false, false, false, false,));
             }
@@ -126,8 +124,8 @@ impl Board {
             match side {
                 Side::White => {
                     if (A2..=H2).contains(&square)
-                        && !self.occupancies[2].get_square(target_square)
-                        && !self.occupancies[2].get_square(two_squares_target)
+                        && !self.state.occupancies[2].get_square(target_square)
+                        && !self.state.occupancies[2].get_square(two_squares_target)
                     {
                         #[rustfmt::skip]
                         movelist.add_move(Move::new( square, two_squares_target, Piece::Pawn, Promotion::None, false, true, false, false,));
@@ -135,8 +133,8 @@ impl Board {
                 }
                 Side::Black => {
                     if (A7..=H7).contains(&square)
-                        && !self.occupancies[2].get_square(target_square)
-                        && !self.occupancies[2].get_square(two_squares_target)
+                        && !self.state.occupancies[2].get_square(target_square)
+                        && !self.state.occupancies[2].get_square(two_squares_target)
                     {
                         #[rustfmt::skip]
                         movelist.add_move(Move::new( square, two_squares_target, Piece::Pawn, Promotion::None, false, true, false, false,));
@@ -150,7 +148,7 @@ impl Board {
     fn generate_noisy_pawn_move(&self, square: Square, side: Side) -> MoveList {
         let mut movelist = MoveList::new();
         let attacks = self.move_generator.get_pawn_attacks(square, side)
-            & self.occupancies[side.get_opposite_side() as usize];
+            & self.state.occupancies[side.get_opposite_side() as usize];
 
         for target_square in attacks.into_iter() {
             if !(A2..=H7).contains(&target_square) {
@@ -168,7 +166,7 @@ impl Board {
                 movelist.add_move(Move::new( square, target_square, Piece::Pawn, Promotion::None, true, false, false, false,));
             }
         }
-        match self.en_passant_square {
+        match self.state.en_passant_square {
             Some(en_passant_square) => {
                 let en_passant_attacks = self.move_generator.get_pawn_attacks(square, side)
                     & (Bitboard(1u64) << en_passant_square);
@@ -184,7 +182,7 @@ impl Board {
     }
 
     fn generate_castling_moves(&self, side: Side) -> MoveList {
-        self.generate_castling_move(side, self.castling_rights[side as usize])
+        self.generate_castling_move(side, self.state.castling_rights[side as usize])
     }
 
     fn generate_castling_move(&self, side: Side, castle: CastleRights) -> MoveList {
@@ -196,7 +194,7 @@ impl Board {
                     Side::White => (Bitboard(0x60), (E1, F1)),
                     Side::Black => (Bitboard(0x6000000000000000), (E8, F8)),
                 };
-                if ((blockers.0 & self.occupancies[2]) == 0)
+                if ((blockers.0 & self.state.occupancies[2]) == 0)
                     && (!self.is_square_attacked(blockers.1 .0, side.get_opposite_side()))
                     && (!self.is_square_attacked(blockers.1 .1, side.get_opposite_side()))
                 {
@@ -217,7 +215,7 @@ impl Board {
                     Side::White => (Bitboard(0xe), (E1, D1)),
                     Side::Black => (Bitboard(0x0e00000000000000), (E8, D8)),
                 };
-                if ((blockers.0 & self.occupancies[2]) == 0)
+                if ((blockers.0 & self.state.occupancies[2]) == 0)
                     && (!self.is_square_attacked(blockers.1 .0, side.get_opposite_side()))
                     && (!self.is_square_attacked(blockers.1 .1, side.get_opposite_side()))
                 {
@@ -245,8 +243,9 @@ impl Board {
 
     fn generate_knight_moves(&self, side: Side) -> MoveList {
         let mut movelist = MoveList::new();
-        for square in self.bitboards[side as usize][Piece::Knight as usize].into_iter() {
-            let quiet_moves = self.move_generator.get_knight_attacks(square) & !self.occupancies[2];
+        for square in self.state.bitboards[side as usize][Piece::Knight as usize].into_iter() {
+            let quiet_moves =
+                self.move_generator.get_knight_attacks(square) & !self.state.occupancies[2];
 
             for target_square in quiet_moves.into_iter() {
                 movelist.add_move(Move::new(
@@ -262,7 +261,7 @@ impl Board {
             }
 
             let captures = self.move_generator.get_knight_attacks(square)
-                & self.occupancies[side.get_opposite_side() as usize];
+                & self.state.occupancies[side.get_opposite_side() as usize];
 
             for target_square in captures.into_iter() {
                 movelist.add_move(Move::new(
@@ -282,8 +281,9 @@ impl Board {
 
     fn generate_king_moves(&self, side: Side) -> MoveList {
         let mut movelist = MoveList::new();
-        for square in self.bitboards[side as usize][Piece::King as usize].into_iter() {
-            let quiet_moves = self.move_generator.get_king_attacks(square) & !self.occupancies[2];
+        for square in self.state.bitboards[side as usize][Piece::King as usize].into_iter() {
+            let quiet_moves =
+                self.move_generator.get_king_attacks(square) & !self.state.occupancies[2];
 
             for target_square in quiet_moves.into_iter() {
                 movelist.add_move(Move::new(
@@ -299,7 +299,7 @@ impl Board {
             }
 
             let captures = self.move_generator.get_king_attacks(square)
-                & self.occupancies[side.get_opposite_side() as usize];
+                & self.state.occupancies[side.get_opposite_side() as usize];
 
             for target_square in captures.into_iter() {
                 movelist.add_move(Move::new(
@@ -319,11 +319,11 @@ impl Board {
 
     fn generate_bishop_moves(&self, side: Side) -> MoveList {
         let mut movelist = MoveList::new();
-        for square in self.bitboards[side as usize][Piece::Bishop as usize].into_iter() {
+        for square in self.state.bitboards[side as usize][Piece::Bishop as usize].into_iter() {
             let quiet_moves = self
                 .move_generator
-                .get_bishop_attacks(square, self.occupancies[2])
-                & !self.occupancies[2];
+                .get_bishop_attacks(square, self.state.occupancies[2])
+                & !self.state.occupancies[2];
 
             for target_square in quiet_moves.into_iter() {
                 movelist.add_move(Move::new(
@@ -340,8 +340,8 @@ impl Board {
 
             let captures = self
                 .move_generator
-                .get_bishop_attacks(square, self.occupancies[2])
-                & self.occupancies[side.get_opposite_side() as usize];
+                .get_bishop_attacks(square, self.state.occupancies[2])
+                & self.state.occupancies[side.get_opposite_side() as usize];
 
             for target_square in captures.into_iter() {
                 movelist.add_move(Move::new(
@@ -361,11 +361,11 @@ impl Board {
 
     fn generate_rook_moves(&self, side: Side) -> MoveList {
         let mut movelist = MoveList::new();
-        for square in self.bitboards[side as usize][Piece::Rook as usize].into_iter() {
+        for square in self.state.bitboards[side as usize][Piece::Rook as usize].into_iter() {
             let quiet_moves = self
                 .move_generator
-                .get_rook_attacks(square, self.occupancies[2])
-                & !self.occupancies[2];
+                .get_rook_attacks(square, self.state.occupancies[2])
+                & !self.state.occupancies[2];
 
             for target_square in quiet_moves.into_iter() {
                 movelist.add_move(Move::new(
@@ -382,8 +382,8 @@ impl Board {
 
             let captures = self
                 .move_generator
-                .get_rook_attacks(square, self.occupancies[2])
-                & self.occupancies[side.get_opposite_side() as usize];
+                .get_rook_attacks(square, self.state.occupancies[2])
+                & self.state.occupancies[side.get_opposite_side() as usize];
 
             for target_square in captures.into_iter() {
                 movelist.add_move(Move::new(
@@ -403,11 +403,11 @@ impl Board {
 
     pub fn generate_queen_moves(&self, side: Side) -> MoveList {
         let mut movelist = MoveList::new();
-        for square in self.bitboards[side as usize][Piece::Queen as usize].into_iter() {
+        for square in self.state.bitboards[side as usize][Piece::Queen as usize].into_iter() {
             let quiet_moves = self
                 .move_generator
-                .get_queen_attacks(square, self.occupancies[2])
-                & !self.occupancies[2];
+                .get_queen_attacks(square, self.state.occupancies[2])
+                & !self.state.occupancies[2];
 
             for target_square in quiet_moves.into_iter() {
                 movelist.add_move(Move::new(
@@ -424,8 +424,8 @@ impl Board {
 
             let captures = self
                 .move_generator
-                .get_queen_attacks(square, self.occupancies[2])
-                & self.occupancies[side.get_opposite_side() as usize];
+                .get_queen_attacks(square, self.state.occupancies[2])
+                & self.state.occupancies[side.get_opposite_side() as usize];
 
             for target_square in captures.into_iter() {
                 movelist.add_move(Move::new(

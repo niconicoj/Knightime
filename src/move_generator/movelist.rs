@@ -16,6 +16,16 @@ impl fmt::Display for MoveList {
     }
 }
 
+impl IntoIterator for MoveList {
+    type Item = Move;
+
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
+
 impl MoveList {
     pub fn new() -> Self {
         Self(vec![])
