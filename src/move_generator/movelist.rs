@@ -142,7 +142,7 @@ impl Move {
         ((self.0 & EN_PASSANT_MASK) >> EN_PASSANT_SHIFT) != 0
     }
 
-    pub fn get_caslting(&self) -> bool {
+    pub fn get_castling(&self) -> bool {
         ((self.0 & CASTLING_MASK) >> CASTLING_SHIFT) != 0
     }
 }
@@ -162,7 +162,7 @@ mod tests {
         assert_eq!(mv.get_capture(), true);
         assert_eq!(mv.get_double_push(), false);
         assert_eq!(mv.get_en_passant(), false);
-        assert_eq!(mv.get_caslting(), false);
+        assert_eq!(mv.get_castling(), false);
         let mv = Move::new(
             G7,
             G8,
@@ -180,6 +180,6 @@ mod tests {
         assert_eq!(mv.get_capture(), false);
         assert_eq!(mv.get_double_push(), false);
         assert_eq!(mv.get_en_passant(), false);
-        assert_eq!(mv.get_caslting(), false);
+        assert_eq!(mv.get_castling(), false);
     }
 }

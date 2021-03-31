@@ -1,4 +1,8 @@
-use std::{convert::TryFrom, hint::unreachable_unchecked};
+use std::{
+    convert::TryFrom,
+    hint::unreachable_unchecked,
+    ops::{BitAnd, BitAndAssign},
+};
 
 pub type Square = u32;
 
@@ -80,11 +84,20 @@ impl TryFrom<u32> for Promotion {
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Debug, Hash)]
+#[repr(u32)]
 pub enum CastleRights {
     None,
     KingSide,
     QueenSide,
     Both,
+}
+
+impl BitAnd<usize> for CastleRights {
+    type Output = Self;
+
+    fn bitand(self, rhs: usize) -> Self::Output {
+        CastleRights::from_index(self.to_index() & rhs)
+    }
 }
 
 impl CastleRights {
