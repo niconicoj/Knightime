@@ -4,7 +4,7 @@ extern crate knightime;
 
 fn main() {
     let mut board =
-        Board::from_fen("r3k2r/ppp2pbp/2nqpnp1/1B1pNb2/3P4/P1N1P3/1PPBQPPP/R3K2R b KQkq - 4 9")
+        Board::from_fen("r3k2r/ppp2pbp/2nqp1p1/1B1pNb2/1P1P4/P1NQP1n1/2PB1PPP/R3K2R b KQkq - 2 11")
             .unwrap();
 
     let moves = board.generate_moves();
