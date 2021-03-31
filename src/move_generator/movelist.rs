@@ -69,10 +69,10 @@ impl fmt::Display for Move {
         }
         write!(f, "{}", SQUARE_NAME[self.get_target_square() as usize])?;
         match self.get_promotion() {
-            Promotion::None => {}
-            _ => {
-                write!(f, "={}", UNICODE_PIECE[0][self.get_promotion() as usize])?;
+            Some(promotion) => {
+                write!(f, "={}", UNICODE_PIECE[0][promotion as usize])?;
             }
+            None => {}
         }
         Ok(())
     }
@@ -89,7 +89,7 @@ impl Move {
         source_square: Square,
         target_square: Square,
         piece: Piece,
-        promotion: Promotion,
+        promotion: Option<Promotion>,
         capture: bool,
         double_push: bool,
         en_passant: bool,
@@ -99,7 +99,10 @@ impl Move {
             source_square
                 | (target_square << TARGET_SQUARE_SHIFT)
                 | ((piece as u32) << PIECE_SHIFT)
-                | ((promotion as u32) << PROMOTION_SHIFT)
+                | ((match promotion {
+                    Some(promotion) => promotion as u32,
+                    None => 0,
+                }) << PROMOTION_SHIFT)
                 | ((capture as u32) << CAPTURE_SHIFT)
                 | ((double_push as u32) << DOUBLE_PUSH_SHIFT)
                 | ((en_passant as u32) << EN_PASSANT_SHIFT)
@@ -120,9 +123,11 @@ impl Move {
             .unwrap_or_else(|_| unsafe { unreachable_unchecked() })
     }
 
-    pub fn get_promotion(&self) -> Promotion {
-        Promotion::try_from((self.0 & PROMOTION_MASK) >> PROMOTION_SHIFT)
-            .unwrap_or_else(|_| unsafe { unreachable_unchecked() })
+    pub fn get_promotion(&self) -> Option<Promotion> {
+        match Promotion::try_from((self.0 & PROMOTION_MASK) >> PROMOTION_SHIFT) {
+            Ok(promotion) => Some(promotion),
+            Err(_) => None,
+        }
     }
 
     pub fn get_capture(&self) -> bool {
@@ -149,20 +154,11 @@ mod tests {
 
     #[test]
     fn move_tests() {
-        let mv = Move::new(
-            E3,
-            F4,
-            Piece::Pawn,
-            Promotion::None,
-            true,
-            false,
-            false,
-            false,
-        );
+        let mv = Move::new(E3, F4, Piece::Pawn, None, true, false, false, false);
         assert_eq!(mv.get_source_square(), E3);
         assert_eq!(mv.get_target_square(), F4);
         assert_eq!(mv.get_piece(), Piece::Pawn);
-        assert_eq!(mv.get_promotion(), Promotion::None);
+        assert_eq!(mv.get_promotion(), None);
         assert_eq!(mv.get_capture(), true);
         assert_eq!(mv.get_double_push(), false);
         assert_eq!(mv.get_en_passant(), false);
@@ -171,7 +167,7 @@ mod tests {
             G7,
             G8,
             Piece::Pawn,
-            Promotion::Queen,
+            Some(Promotion::Queen),
             false,
             false,
             false,
@@ -180,7 +176,7 @@ mod tests {
         assert_eq!(mv.get_source_square(), G7);
         assert_eq!(mv.get_target_square(), G8);
         assert_eq!(mv.get_piece(), Piece::Pawn);
-        assert_eq!(mv.get_promotion(), Promotion::Queen);
+        assert_eq!(mv.get_promotion(), Some(Promotion::Queen));
         assert_eq!(mv.get_capture(), false);
         assert_eq!(mv.get_double_push(), false);
         assert_eq!(mv.get_en_passant(), false);

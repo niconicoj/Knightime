@@ -59,7 +59,6 @@ impl TryFrom<u32> for Piece {
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u32)]
 pub enum Promotion {
-    None = 0,
     Queen = 1,
     Knight = 3,
     Bishop = 4,
@@ -71,7 +70,6 @@ impl TryFrom<u32> for Promotion {
 
     fn try_from(value: u32) -> Result<Self, Self::Error> {
         match value {
-            0 => Ok(Promotion::None),
             1 => Ok(Promotion::Queen),
             3 => Ok(Promotion::Knight),
             4 => Ok(Promotion::Bishop),

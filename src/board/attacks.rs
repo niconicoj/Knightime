@@ -105,17 +105,17 @@ impl Board {
             && !self.state.occupancies[2].get_square(target_square)
         {
             #[rustfmt::skip]
-            movelist.add_move(Move::new(square, target_square, Piece::Pawn, Promotion::Queen, false, false, false, false,));
+            movelist.add_move(Move::new(square, target_square, Piece::Pawn, Some(Promotion::Queen), false, false, false, false,));
             #[rustfmt::skip]
-            movelist.add_move(Move::new( square, target_square, Piece::Pawn, Promotion::Rook, false, false, false, false,));
+            movelist.add_move(Move::new( square, target_square, Piece::Pawn, Some(Promotion::Rook), false, false, false, false,));
             #[rustfmt::skip]
-            movelist.add_move(Move::new( square, target_square, Piece::Pawn, Promotion::Bishop, false, false, false, false,));
+            movelist.add_move(Move::new( square, target_square, Piece::Pawn, Some(Promotion::Bishop), false, false, false, false,));
             #[rustfmt::skip]
-            movelist.add_move(Move::new( square, target_square, Piece::Pawn, Promotion::Knight, false, false, false, false,));
+            movelist.add_move(Move::new( square, target_square, Piece::Pawn, Some(Promotion::Knight), false, false, false, false,));
         } else {
             if !self.state.occupancies[2].get_square(target_square) {
                 #[rustfmt::skip]
-                movelist.add_move(Move::new( square, target_square, Piece::Pawn, Promotion::None, false, false, false, false,));
+                movelist.add_move(Move::new( square, target_square, Piece::Pawn, None, false, false, false, false,));
             }
             let two_squares_target = match side {
                 Side::White => square + 16,
@@ -128,7 +128,7 @@ impl Board {
                         && !self.state.occupancies[2].get_square(two_squares_target)
                     {
                         #[rustfmt::skip]
-                        movelist.add_move(Move::new( square, two_squares_target, Piece::Pawn, Promotion::None, false, true, false, false,));
+                        movelist.add_move(Move::new( square, two_squares_target, Piece::Pawn, None, false, true, false, false,));
                     }
                 }
                 Side::Black => {
@@ -137,7 +137,7 @@ impl Board {
                         && !self.state.occupancies[2].get_square(two_squares_target)
                     {
                         #[rustfmt::skip]
-                        movelist.add_move(Move::new( square, two_squares_target, Piece::Pawn, Promotion::None, false, true, false, false,));
+                        movelist.add_move(Move::new( square, two_squares_target, Piece::Pawn, None, false, true, false, false,));
                     }
                 }
             }
@@ -154,16 +154,16 @@ impl Board {
             if !(A2..=H7).contains(&target_square) {
                 // promotion happens
                 #[rustfmt::skip]
-                movelist.add_move(Move::new( square, target_square, Piece::Pawn, Promotion::Queen, true, false, false, false,));
+                movelist.add_move(Move::new( square, target_square, Piece::Pawn, Some(Promotion::Queen), true, false, false, false,));
                 #[rustfmt::skip]
-                movelist.add_move(Move::new( square, target_square, Piece::Pawn, Promotion::Rook, true, false, false, false,));
+                movelist.add_move(Move::new( square, target_square, Piece::Pawn, Some(Promotion::Rook), true, false, false, false,));
                 #[rustfmt::skip]
-                movelist.add_move(Move::new( square, target_square, Piece::Pawn, Promotion::Bishop, true, false, false, false,));
+                movelist.add_move(Move::new( square, target_square, Piece::Pawn, Some(Promotion::Bishop), true, false, false, false,));
                 #[rustfmt::skip]
-                movelist.add_move(Move::new( square, target_square, Piece::Pawn, Promotion::Knight, true, false, false, false,));
+                movelist.add_move(Move::new( square, target_square, Piece::Pawn, Some(Promotion::Knight), true, false, false, false,));
             } else {
                 #[rustfmt::skip]
-                movelist.add_move(Move::new( square, target_square, Piece::Pawn, Promotion::None, true, false, false, false,));
+                movelist.add_move(Move::new( square, target_square, Piece::Pawn, None, true, false, false, false,));
             }
         }
         match self.state.en_passant_square {
@@ -173,7 +173,7 @@ impl Board {
 
                 for target_square in en_passant_attacks.into_iter() {
                     #[rustfmt::skip]
-                    movelist.add_move(Move::new( square, target_square, Piece::Pawn, Promotion::None, true, false, true, false,));
+                    movelist.add_move(Move::new( square, target_square, Piece::Pawn, None, true, false, true, false,));
                 }
             }
             None => {}
@@ -202,7 +202,7 @@ impl Board {
                         CASTLE_SQUARE[side as usize][(castle as usize) - 1].0,
                         CASTLE_SQUARE[side as usize][(castle as usize) - 1].1,
                         Piece::King,
-                        Promotion::None,
+                        None,
                         false,
                         false,
                         false,
@@ -223,7 +223,7 @@ impl Board {
                         CASTLE_SQUARE[side as usize][(castle as usize) - 1].0,
                         CASTLE_SQUARE[side as usize][(castle as usize) - 1].1,
                         Piece::King,
-                        Promotion::None,
+                        None,
                         false,
                         false,
                         false,
@@ -252,7 +252,7 @@ impl Board {
                     square,
                     target_square,
                     Piece::Knight,
-                    Promotion::None,
+                    None,
                     false,
                     false,
                     false,
@@ -268,7 +268,7 @@ impl Board {
                     square,
                     target_square,
                     Piece::Knight,
-                    Promotion::None,
+                    None,
                     true,
                     false,
                     false,
@@ -290,7 +290,7 @@ impl Board {
                     square,
                     target_square,
                     Piece::King,
-                    Promotion::None,
+                    None,
                     false,
                     false,
                     false,
@@ -306,7 +306,7 @@ impl Board {
                     square,
                     target_square,
                     Piece::King,
-                    Promotion::None,
+                    None,
                     true,
                     false,
                     false,
@@ -330,7 +330,7 @@ impl Board {
                     square,
                     target_square,
                     Piece::Bishop,
-                    Promotion::None,
+                    None,
                     false,
                     false,
                     false,
@@ -348,7 +348,7 @@ impl Board {
                     square,
                     target_square,
                     Piece::Bishop,
-                    Promotion::None,
+                    None,
                     true,
                     false,
                     false,
@@ -372,7 +372,7 @@ impl Board {
                     square,
                     target_square,
                     Piece::Rook,
-                    Promotion::None,
+                    None,
                     false,
                     false,
                     false,
@@ -390,7 +390,7 @@ impl Board {
                     square,
                     target_square,
                     Piece::Rook,
-                    Promotion::None,
+                    None,
                     true,
                     false,
                     false,
@@ -414,7 +414,7 @@ impl Board {
                     square,
                     target_square,
                     Piece::Queen,
-                    Promotion::None,
+                    None,
                     false,
                     false,
                     false,
@@ -432,7 +432,7 @@ impl Board {
                     square,
                     target_square,
                     Piece::Queen,
-                    Promotion::None,
+                    None,
                     true,
                     false,
                     false,
@@ -465,12 +465,12 @@ mod tests {
         #[rustfmt::skip]
         assert!(
             pawn_moves.contains(
-            Move::new(D2, D3, Piece::Pawn, Promotion::None, false, false, false, false)
+            Move::new(D2, D3, Piece::Pawn, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(
             pawn_moves.contains(
-            Move::new(D2, D4, Piece::Pawn, Promotion::None, false, true, false, false)
+            Move::new(D2, D4, Piece::Pawn, None, false, true, false, false)
         ));
         assert_eq!(pawn_moves.get(2), None);
         let pawn_moves = board.generate_quiet_pawn_move(D7, Side::Black);
@@ -478,12 +478,12 @@ mod tests {
         #[rustfmt::skip]
         assert_eq!(
             *pawn_moves.get(0).unwrap(),
-            Move::new(D7, D6, Piece::Pawn, Promotion::None, false, false, false, false)
+            Move::new(D7, D6, Piece::Pawn, None, false, false, false, false)
         );
         #[rustfmt::skip]
         assert_eq!(
             *pawn_moves.get(1).unwrap(),
-            Move::new(D7, D5, Piece::Pawn, Promotion::None, false, true, false, false)
+            Move::new(D7, D5, Piece::Pawn, None, false, true, false, false)
         );
         assert_eq!(pawn_moves.get(2), None);
     }
@@ -495,12 +495,12 @@ mod tests {
         #[rustfmt::skip]
         assert_eq!(
             *pawn_moves.get(0).unwrap(),
-            Move::new(C2, B3, Piece::Pawn, Promotion::None, true, false, false, false)
+            Move::new(C2, B3, Piece::Pawn, None, true, false, false, false)
         );
         #[rustfmt::skip]
         assert_eq!(
             *pawn_moves.get(1).unwrap(),
-            Move::new(C2, D3, Piece::Pawn, Promotion::None, true, false, false, false)
+            Move::new(C2, D3, Piece::Pawn, None, true, false, false, false)
         );
         assert_eq!(pawn_moves.get(2), None);
         let pawn_moves = board.generate_noisy_pawn_move(E2, Side::White);
@@ -508,36 +508,36 @@ mod tests {
         #[rustfmt::skip]
         assert_eq!(
             *pawn_moves.get(0).unwrap(),
-            Move::new(E2, D3, Piece::Pawn, Promotion::None, true, false, false, false)
+            Move::new(E2, D3, Piece::Pawn, None, true, false, false, false)
         );
         assert_eq!(pawn_moves.get(1), None);
         let pawn_moves = board.generate_noisy_pawn_move(G5, Side::White);
         #[rustfmt::skip]
         assert_eq!(
             *pawn_moves.get(0).unwrap(),
-            Move::new(G5, H6, Piece::Pawn, Promotion::None, true, false, true, false)
+            Move::new(G5, H6, Piece::Pawn, None, true, false, true, false)
         );
         assert_eq!(pawn_moves.get(2), None);
         let pawn_moves = board.generate_noisy_pawn_move(F7, Side::White);
         #[rustfmt::skip]
         assert_eq!(
             *pawn_moves.get(0).unwrap(),
-            Move::new(F7, G8, Piece::Pawn, Promotion::Queen, true, false, false, false)
+            Move::new(F7, G8, Piece::Pawn, Some(Promotion::Queen), true, false, false, false)
         );
         #[rustfmt::skip]
         assert_eq!(
             *pawn_moves.get(1).unwrap(),
-            Move::new(F7, G8, Piece::Pawn, Promotion::Rook, true, false, false, false)
+            Move::new(F7, G8, Piece::Pawn, Some(Promotion::Rook), true, false, false, false)
         );
         #[rustfmt::skip]
         assert_eq!(
             *pawn_moves.get(2).unwrap(),
-            Move::new(F7, G8, Piece::Pawn, Promotion::Bishop, true, false, false, false)
+            Move::new(F7, G8, Piece::Pawn, Some(Promotion::Bishop), true, false, false, false)
         );
         #[rustfmt::skip]
         assert_eq!(
             *pawn_moves.get(3).unwrap(),
-            Move::new(F7, G8, Piece::Pawn, Promotion::Knight, true, false, false, false)
+            Move::new(F7, G8, Piece::Pawn, Some(Promotion::Knight), true, false, false, false)
         );
         assert_eq!(pawn_moves.get(4), None);
     }
@@ -549,22 +549,22 @@ mod tests {
         #[rustfmt::skip]
         assert_eq!(
             *pawn_moves.get(0).unwrap(),
-            Move::new(E7, E8, Piece::Pawn, Promotion::Queen, false, false, false, false)
+            Move::new(E7, E8, Piece::Pawn, Some(Promotion::Queen), false, false, false, false)
         );
         #[rustfmt::skip]
         assert_eq!(
             *pawn_moves.get(1).unwrap(),
-            Move::new(E7, E8, Piece::Pawn, Promotion::Rook, false, false, false, false)
+            Move::new(E7, E8, Piece::Pawn, Some(Promotion::Rook), false, false, false, false)
         );
         #[rustfmt::skip]
         assert_eq!(
             *pawn_moves.get(2).unwrap(),
-            Move::new(E7, E8, Piece::Pawn, Promotion::Bishop, false, false, false, false)
+            Move::new(E7, E8, Piece::Pawn, Some(Promotion::Bishop), false, false, false, false)
         );
         #[rustfmt::skip]
         assert_eq!(
             *pawn_moves.get(3).unwrap(),
-            Move::new(E7, E8, Piece::Pawn, Promotion::Knight, false, false, false, false)
+            Move::new(E7, E8, Piece::Pawn, Some(Promotion::Knight), false, false, false, false)
         );
         assert_eq!(pawn_moves.get(4), None);
         let pawn_moves = board.generate_quiet_pawn_move(B7, Side::White);
@@ -593,7 +593,7 @@ mod tests {
         #[rustfmt::skip]
         assert_eq!(
             *castling_moves.get(0).unwrap(),
-            Move::new(E8, G8, Piece::King, Promotion::None, false, false, false, true)
+            Move::new(E8, G8, Piece::King, None, false, false, false, true)
         );
         assert_eq!(castling_moves.get(1), None);
         // here black is in check, but white can castle both sides
@@ -604,12 +604,12 @@ mod tests {
         #[rustfmt::skip]
         assert_eq!(
             *castling_moves.get(0).unwrap(),
-            Move::new(E1, G1, Piece::King, Promotion::None, false, false, false, true)
+            Move::new(E1, G1, Piece::King, None, false, false, false, true)
         );
         #[rustfmt::skip]
         assert_eq!(
             *castling_moves.get(1).unwrap(),
-            Move::new(E1, C1, Piece::King, Promotion::None, false, false, false, true)
+            Move::new(E1, C1, Piece::King, None, false, false, false, true)
         );
         assert_eq!(castling_moves.get(2), None);
         let castling_moves = board.generate_castling_moves(Side::Black);
@@ -630,27 +630,27 @@ mod tests {
         let knight_moves = board.generate_knight_moves(Side::White);
         #[rustfmt::skip]
         assert!(knight_moves.contains(
-            Move::new(E4, D2, Piece::Knight, Promotion::None, false, false, false, false)
+            Move::new(E4, D2, Piece::Knight, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(knight_moves.contains(
-            Move::new(E4, C3, Piece::Knight, Promotion::None, false, false, false, false)
+            Move::new(E4, C3, Piece::Knight, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(knight_moves.contains(
-            Move::new(E4, D6, Piece::Knight, Promotion::None, false, false, false, false)
+            Move::new(E4, D6, Piece::Knight, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(knight_moves.contains(
-            Move::new(E4, G5, Piece::Knight, Promotion::None, false, false, false, false)
+            Move::new(E4, G5, Piece::Knight, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(knight_moves.contains(
-            Move::new(E4, G3, Piece::Knight, Promotion::None, true, false, false, false)
+            Move::new(E4, G3, Piece::Knight, None, true, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(knight_moves.contains(
-            Move::new(E4, F6, Piece::Knight, Promotion::None, true, false, false, false)
+            Move::new(E4, F6, Piece::Knight, None, true, false, false, false)
         ));
         println!("{}", knight_moves);
         assert_eq!(knight_moves.len(), 6);
@@ -662,27 +662,27 @@ mod tests {
         let king_moves = board.generate_king_moves(Side::White);
         #[rustfmt::skip]
         assert!(king_moves.contains(
-            Move::new(D4, D5, Piece::King, Promotion::None, false, false, false, false)
+            Move::new(D4, D5, Piece::King, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(king_moves.contains(
-            Move::new(D4, E4, Piece::King, Promotion::None, false, false, false, false)
+            Move::new(D4, E4, Piece::King, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(king_moves.contains(
-            Move::new(D4, D3, Piece::King, Promotion::None, false, false, false, false)
+            Move::new(D4, D3, Piece::King, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(king_moves.contains(
-            Move::new(D4, C5, Piece::King, Promotion::None, false, false, false, false)
+            Move::new(D4, C5, Piece::King, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(king_moves.contains(
-            Move::new(D4, E5, Piece::King, Promotion::None, true, false, false, false)
+            Move::new(D4, E5, Piece::King, None, true, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(king_moves.contains(
-            Move::new(D4, C4, Piece::King, Promotion::None, true, false, false, false)
+            Move::new(D4, C4, Piece::King, None, true, false, false, false)
         ));
         assert_eq!(king_moves.len(), 6);
     }
@@ -693,31 +693,31 @@ mod tests {
         let bishop_moves = board.generate_bishop_moves(Side::White);
         #[rustfmt::skip]
         assert!(bishop_moves.contains(
-            Move::new(F3, G2, Piece::Bishop, Promotion::None, false, false, false, false)
+            Move::new(F3, G2, Piece::Bishop, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(bishop_moves.contains(
-            Move::new(F3, H1, Piece::Bishop, Promotion::None, false, false, false, false)
+            Move::new(F3, H1, Piece::Bishop, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(bishop_moves.contains(
-            Move::new(F3, G4, Piece::Bishop, Promotion::None, false, false, false, false)
+            Move::new(F3, G4, Piece::Bishop, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(bishop_moves.contains(
-            Move::new(F3, E4, Piece::Bishop, Promotion::None, false, false, false, false)
+            Move::new(F3, E4, Piece::Bishop, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(bishop_moves.contains(
-            Move::new(F3, D5, Piece::Bishop, Promotion::None, false, false, false, false)
+            Move::new(F3, D5, Piece::Bishop, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(bishop_moves.contains(
-            Move::new(F3, C6, Piece::Bishop, Promotion::None, true, false, false, false)
+            Move::new(F3, C6, Piece::Bishop, None, true, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(bishop_moves.contains(
-            Move::new(F3, H5, Piece::Bishop, Promotion::None, true, false, false, false)
+            Move::new(F3, H5, Piece::Bishop, None, true, false, false, false)
         ));
         assert_eq!(bishop_moves.len(), 7);
     }
@@ -728,35 +728,35 @@ mod tests {
         let rook_moves = board.generate_rook_moves(Side::White);
         #[rustfmt::skip]
         assert!(rook_moves.contains(
-            Move::new(F3, E3, Piece::Rook, Promotion::None, false, false, false, false)
+            Move::new(F3, E3, Piece::Rook, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(rook_moves.contains(
-            Move::new(F3, G3, Piece::Rook, Promotion::None, false, false, false, false)
+            Move::new(F3, G3, Piece::Rook, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(rook_moves.contains(
-            Move::new(F3, F2, Piece::Rook, Promotion::None, false, false, false, false)
+            Move::new(F3, F2, Piece::Rook, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(rook_moves.contains(
-            Move::new(F3, F1, Piece::Rook, Promotion::None, false, false, false, false)
+            Move::new(F3, F1, Piece::Rook, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(rook_moves.contains(
-            Move::new(F3, F4, Piece::Rook, Promotion::None, false, false, false, false)
+            Move::new(F3, F4, Piece::Rook, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(rook_moves.contains(
-            Move::new(F3, F5, Piece::Rook, Promotion::None, false, false, false, false)
+            Move::new(F3, F5, Piece::Rook, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(rook_moves.contains(
-            Move::new(F3, F6, Piece::Rook, Promotion::None, true, false, false, false)
+            Move::new(F3, F6, Piece::Rook, None, true, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(rook_moves.contains(
-            Move::new(F3, H3, Piece::Rook, Promotion::None, true, false, false, false)
+            Move::new(F3, H3, Piece::Rook, None, true, false, false, false)
         ));
         assert_eq!(rook_moves.len(), 8);
     }
@@ -767,35 +767,35 @@ mod tests {
         let queen_moves = board.generate_queen_moves(Side::White);
         #[rustfmt::skip]
         assert!(queen_moves.contains(
-            Move::new(G2, G1, Piece::Queen, Promotion::None, false, false, false, false)
+            Move::new(G2, G1, Piece::Queen, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(queen_moves.contains(
-            Move::new(G2, G3, Piece::Queen, Promotion::None, false, false, false, false)
+            Move::new(G2, G3, Piece::Queen, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(queen_moves.contains(
-            Move::new(G2, G4, Piece::Queen, Promotion::None, false, false, false, false)
+            Move::new(G2, G4, Piece::Queen, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(queen_moves.contains(
-            Move::new(G2, H3, Piece::Queen, Promotion::None, false, false, false, false)
+            Move::new(G2, H3, Piece::Queen, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(queen_moves.contains(
-            Move::new(G2, F1, Piece::Queen, Promotion::None, false, false, false, false)
+            Move::new(G2, F1, Piece::Queen, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(queen_moves.contains(
-            Move::new(G2, F3, Piece::Queen, Promotion::None, false, false, false, false)
+            Move::new(G2, F3, Piece::Queen, None, false, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(queen_moves.contains(
-            Move::new(G2, H2, Piece::Queen, Promotion::None, true, false, false, false)
+            Move::new(G2, H2, Piece::Queen, None, true, false, false, false)
         ));
         #[rustfmt::skip]
         assert!(queen_moves.contains(
-            Move::new(G2, E4, Piece::Queen, Promotion::None, true, false, false, false)
+            Move::new(G2, E4, Piece::Queen, None, true, false, false, false)
         ));
         assert_eq!(queen_moves.len(), 9);
     }

@@ -3,8 +3,7 @@ use knightime::board::Board;
 extern crate knightime;
 
 fn main() {
-    let mut board =
-        Board::from_fen("6k1/pr3pp1/1p3q1p/2p5/3n4/P1BP3P/1P3PP1/R1Q3K1 b - - 1 24").unwrap();
+    let mut board = Board::from_fen("8/8/5K2/8/8/6k1/7p/6N1 b - - 1 52").unwrap();
 
     let moves = board.generate_moves();
 
