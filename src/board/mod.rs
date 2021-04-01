@@ -19,6 +19,8 @@ use self::{
     defs::ParseFenError,
 };
 
+pub use make::MakeMoveError;
+
 #[derive(Clone, Copy)]
 pub struct BoardState {
     pub bitboards: [[Bitboard; 6]; 2],

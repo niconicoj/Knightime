@@ -1,4 +1,5 @@
 use knightime::board::Board;
+use knightime::board::MakeMoveError;
 
 extern crate knightime;
 
@@ -12,8 +13,14 @@ fn main() {
     println!("{}", moves);
 
     for mv in moves.into_iter() {
-        board.make_move(mv, false);
-        println!("{}", board);
-        board.take_back_move();
+        match board.make_move(mv, false) {
+            Ok(_) => {
+                board.take_back_move();
+            }
+            Err(MakeMoveError::IllegalMove(illegal_move)) => {
+                println!("illegal move : {}", illegal_move);
+            }
+            _ => {}
+        };
     }
 }

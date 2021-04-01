@@ -2,16 +2,21 @@ use std::hint::unreachable_unchecked;
 
 use crate::{
     constants::*,
-    defs::{CastleRights, Piece, Side},
+    defs::{Piece, Side},
     move_generator::movelist::Move,
 };
 
 use super::Board;
 
+pub enum MakeMoveError {
+    IllegalMove(Move),
+    NotACapture,
+}
+
 impl Board {
-    pub fn make_move(&mut self, mv: Move, only_capture: bool) {
+    pub fn make_move(&mut self, mv: Move, only_capture: bool) -> Result<(), MakeMoveError> {
         if mv.get_capture() && only_capture {
-            return;
+            return Err(MakeMoveError::NotACapture);
         }
         self.store_state();
 
@@ -91,11 +96,28 @@ impl Board {
             }
         }
 
+        // update castle rights
         self.state.castling_rights[self.state.side_to_move as usize] = self.state.castling_rights
             [self.state.side_to_move as usize]
             & CASTLING_RIGHTS_UPDATE_TABLE[mv.get_source_square() as usize];
         self.state.castling_rights[self.state.side_to_move.get_opposite_side() as usize] =
             self.state.castling_rights[self.state.side_to_move.get_opposite_side() as usize]
                 & CASTLING_RIGHTS_UPDATE_TABLE[mv.get_target_square() as usize];
+
+        // update occupancies
+        self.state.occupancies = Board::compute_occupancies(self.state.bitboards);
+
+        // if King on side to move is in check rollback
+
+        if self.is_square_attacked(
+            self.state.bitboards[self.state.side_to_move as usize][Piece::King as usize]
+                .get_ls1b_index()
+                .unwrap(),
+            self.state.side_to_move.get_opposite_side(),
+        ) {
+            self.take_back_move();
+            return Err(MakeMoveError::IllegalMove(mv));
+        };
+        Ok(())
     }
 }

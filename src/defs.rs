@@ -1,8 +1,4 @@
-use std::{
-    convert::TryFrom,
-    hint::unreachable_unchecked,
-    ops::{BitAnd, BitAndAssign},
-};
+use std::{convert::TryFrom, hint::unreachable_unchecked, ops::BitAnd};
 
 pub type Square = u32;
 
