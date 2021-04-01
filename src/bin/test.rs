@@ -1,26 +1,29 @@
-use knightime::board::Board;
-use knightime::board::MakeMoveError;
+use std::time::SystemTime;
+
+use knightime::{board::Board, perft::Perft};
 
 extern crate knightime;
 
 fn main() {
-    let mut board =
-        Board::from_fen("r3k2r/ppp2pbp/2nqp1p1/1B1pNb2/1P1P4/P1NQP1n1/2PB1PPP/R3K2R b KQkq - 2 11")
-            .unwrap();
+    let board = Board::default();
 
-    let moves = board.generate_moves();
+    let mut perft = Perft::new(board);
 
-    println!("{}", moves);
+    let start = SystemTime::now();
 
-    for mv in moves.into_iter() {
-        match board.make_move(mv, false) {
-            Ok(_) => {
-                board.take_back_move();
-            }
-            Err(MakeMoveError::IllegalMove(illegal_move)) => {
-                println!("illegal move : {}", illegal_move);
-            }
-            _ => {}
-        };
+    perft.detailed_run(6, None);
+
+    let duration = start.elapsed();
+
+    match duration {
+        Ok(d) => {
+            println!("time for perft : {}", d.as_millis());
+            println!("nodes : {}", perft.nodes);
+            println!("captures : {}", perft.captures);
+            println!("en passant : {}", perft.en_passants);
+            println!("castling : {}", perft.castles);
+            println!("promotion : {}", perft.promotions);
+        }
+        Err(_) => {}
     }
 }

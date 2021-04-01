@@ -95,14 +95,15 @@ impl Board {
                 _ => unsafe { unreachable_unchecked() },
             }
         }
+        let side = self.state.side_to_move as usize;
+        let opposite = self.state.side_to_move.get_opposite_side() as usize;
 
         // update castle rights
-        self.state.castling_rights[self.state.side_to_move as usize] = self.state.castling_rights
-            [self.state.side_to_move as usize]
-            & CASTLING_RIGHTS_UPDATE_TABLE[mv.get_source_square() as usize];
-        self.state.castling_rights[self.state.side_to_move.get_opposite_side() as usize] =
-            self.state.castling_rights[self.state.side_to_move.get_opposite_side() as usize]
-                & CASTLING_RIGHTS_UPDATE_TABLE[mv.get_target_square() as usize];
+        self.state.castling_rights[side] = self.state.castling_rights[side]
+            & CASTLING_RIGHTS_UPDATE_TABLE[side][mv.get_source_square() as usize];
+
+        self.state.castling_rights[opposite] = self.state.castling_rights[opposite]
+            & CASTLING_RIGHTS_UPDATE_TABLE[opposite][mv.get_target_square() as usize];
 
         // update occupancies
         self.state.occupancies = Board::compute_occupancies(self.state.bitboards);
@@ -118,6 +119,8 @@ impl Board {
             self.take_back_move();
             return Err(MakeMoveError::IllegalMove(mv));
         };
+
+        self.state.side_to_move = self.state.side_to_move.get_opposite_side();
         Ok(())
     }
 }

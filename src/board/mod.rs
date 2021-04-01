@@ -21,7 +21,7 @@ use self::{
 
 pub use make::MakeMoveError;
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct BoardState {
     pub bitboards: [[Bitboard; 6]; 2],
     pub occupancies: [Bitboard; 3],
@@ -32,6 +32,7 @@ pub struct BoardState {
 
 pub type BoardHistory = Vec<BoardState>;
 
+#[derive(Debug)]
 pub struct Board {
     state: BoardState,
     history: BoardHistory,
@@ -109,7 +110,7 @@ impl Board {
         // first block is in regard to piece placement, it start from rank 8 all the way to rank 1
         let fen_parts: Vec<&str> = fen_string.trim().split(' ').collect();
 
-        match fen_parts.len() == 6 {
+        match fen_parts.len() >= 4 {
             false => return Err(ParseFenError::BadFenFormat("wrong number of args")),
             true => {}
         };

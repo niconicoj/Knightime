@@ -52,7 +52,7 @@ impl MoveList {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Move(u32);
 
 impl fmt::Display for Move {

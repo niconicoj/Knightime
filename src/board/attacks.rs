@@ -117,27 +117,27 @@ impl Board {
                 #[rustfmt::skip]
                 movelist.add_move(Move::new( square, target_square, Piece::Pawn, None, false, false, false, false,));
             }
-            let two_squares_target = match side {
-                Side::White => square + 16,
-                Side::Black => square - 16,
-            };
             match side {
                 Side::White => {
-                    if (A2..=H2).contains(&square)
-                        && !self.state.occupancies[2].get_square(target_square)
-                        && !self.state.occupancies[2].get_square(two_squares_target)
-                    {
-                        #[rustfmt::skip]
-                        movelist.add_move(Move::new( square, two_squares_target, Piece::Pawn, None, false, true, false, false,));
+                    if (A2..=H2).contains(&square) {
+                        let two_squares_target = square + 16;
+                        if !self.state.occupancies[2].get_square(target_square)
+                            && !self.state.occupancies[2].get_square(two_squares_target)
+                        {
+                            #[rustfmt::skip]
+                            movelist.add_move(Move::new( square, two_squares_target, Piece::Pawn, None, false, true, false, false,));
+                        }
                     }
                 }
                 Side::Black => {
-                    if (A7..=H7).contains(&square)
-                        && !self.state.occupancies[2].get_square(target_square)
-                        && !self.state.occupancies[2].get_square(two_squares_target)
-                    {
-                        #[rustfmt::skip]
-                        movelist.add_move(Move::new( square, two_squares_target, Piece::Pawn, None, false, true, false, false,));
+                    if (A7..=H7).contains(&square) {
+                        let two_squares_target = square - 16;
+                        if !self.state.occupancies[2].get_square(target_square)
+                            && !self.state.occupancies[2].get_square(two_squares_target)
+                        {
+                            #[rustfmt::skip]
+                            movelist.add_move(Move::new( square, two_squares_target, Piece::Pawn, None, false, true, false, false,));
+                        }
                     }
                 }
             }
@@ -192,7 +192,7 @@ impl Board {
             CastleRights::KingSide => {
                 let blockers = match side {
                     Side::White => (Bitboard(0x60), (E1, F1)),
-                    Side::Black => (Bitboard(0x6000000000000000), (E8, F8)),
+                    Side::Black => (Bitboard(0x6000_0000_0000_0000), (E8, F8)),
                 };
                 if ((blockers.0 & self.state.occupancies[2]) == 0)
                     && (!self.is_square_attacked(blockers.1 .0, side.get_opposite_side()))
@@ -213,7 +213,7 @@ impl Board {
             CastleRights::QueenSide => {
                 let blockers = match side {
                     Side::White => (Bitboard(0xe), (E1, D1)),
-                    Side::Black => (Bitboard(0x0e00000000000000), (E8, D8)),
+                    Side::Black => (Bitboard(0x0e00_0000_0000_0000), (E8, D8)),
                 };
                 if ((blockers.0 & self.state.occupancies[2]) == 0)
                     && (!self.is_square_attacked(blockers.1 .0, side.get_opposite_side()))
@@ -569,6 +569,12 @@ mod tests {
         assert_eq!(pawn_moves.get(4), None);
         let pawn_moves = board.generate_quiet_pawn_move(B7, Side::White);
         println!("{}", pawn_moves);
+        assert_eq!(pawn_moves.get(0), None);
+
+        let board =
+            Board::from_fen("r3k2r/p1ppkpb1/bn2pnp1/3PN3/1p2P3/P1N2Q2/1PPBBPpP/R3K1R1 b - - 0 1")
+                .unwrap();
+        let pawn_moves = board.generate_quiet_pawn_move(G2, Side::Black);
         assert_eq!(pawn_moves.get(0), None);
     }
 

@@ -130,3 +130,32 @@ impl CastleRights {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn castle_bitwise_and_tests() {
+        let castle_rights = CastleRights::Both;
+
+        assert_eq!(castle_rights & 0, CastleRights::None);
+        assert_eq!(castle_rights & 1, CastleRights::KingSide);
+        assert_eq!(castle_rights & 2, CastleRights::QueenSide);
+        assert_eq!(castle_rights & 3, CastleRights::Both);
+
+        let castle_rights = CastleRights::KingSide;
+
+        assert_eq!(castle_rights & 0, CastleRights::None);
+        assert_eq!(castle_rights & 1, CastleRights::KingSide);
+        assert_eq!(castle_rights & 2, CastleRights::None);
+        assert_eq!(castle_rights & 3, CastleRights::KingSide);
+
+        let castle_rights = CastleRights::QueenSide;
+
+        assert_eq!(castle_rights & 0, CastleRights::None);
+        assert_eq!(castle_rights & 1, CastleRights::None);
+        assert_eq!(castle_rights & 2, CastleRights::QueenSide);
+        assert_eq!(castle_rights & 3, CastleRights::QueenSide);
+    }
+}
