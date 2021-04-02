@@ -79,6 +79,19 @@ impl TryFrom<u32> for Promotion {
     }
 }
 
+impl TryFrom<char> for Promotion {
+    type Error = &'static str;
+
+    fn try_from(value: char) -> Result<Self, Self::Error> {
+        match value {
+            'q' => Ok(Promotion::Queen),
+            'n' => Ok(Promotion::Knight),
+            'b' => Ok(Promotion::Bishop),
+            'r' => Ok(Promotion::Rook),
+            _ => Err("fail to decode promotion from u32"),
+        }
+    }
+}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Debug, Hash)]
 #[repr(u32)]
 pub enum CastleRights {

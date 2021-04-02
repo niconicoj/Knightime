@@ -124,6 +124,6 @@ impl MoveGenerator {
         };
         const ERROR: &str = "Initializing magics failed. Check magic numbers.";
 
-        assert!(offset == expectation, ERROR);
+        assert!(offset == expectation, "{}", ERROR);
     }
 }
