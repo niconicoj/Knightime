@@ -12,7 +12,7 @@ mod init;
 mod mask;
 pub mod movelist;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct MoveGenerator {
     white_pawns: Vec<Bitboard>,
     black_pawns: Vec<Bitboard>,

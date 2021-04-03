@@ -3,7 +3,7 @@ mod constants;
 mod defs;
 mod make;
 
-use std::fmt;
+use std::{convert::TryFrom, fmt};
 
 use crate::{
     bitboard::Bitboard,
@@ -21,7 +21,7 @@ use self::{
 
 pub use make::MakeMoveError;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct BoardState {
     pub bitboards: [[Bitboard; 6]; 2],
     pub occupancies: [Bitboard; 3],
@@ -59,7 +59,7 @@ impl fmt::Display for Board {
         for rank in (0u64..8u64).rev() {
             for file in 0u64..8u64 {
                 if file == 0 {
-                    print!("{}   ", rank + 1);
+                    write!(f, "{}   ", rank + 1)?;
                 }
 
                 let mut occupied = false;
@@ -91,6 +91,42 @@ impl fmt::Display for Board {
     }
 }
 
+impl TryFrom<Vec<&str>> for Board {
+    type Error = ParseFenError;
+
+    fn try_from(value: Vec<&str>) -> Result<Self, Self::Error> {
+        match value.len() >= 4 {
+            false => return Err(ParseFenError::BadFenFormat("wrong number of args")),
+            true => {}
+        };
+
+        let bitboards = Self::parse_fen_positions(value[0])?;
+        let side_to_move = Self::parse_fen_side_to_move(value[1])?;
+        let castling_rights = Self::parse_fen_castling_rights(value[2])?;
+        let en_passant_square = Self::parse_fen_en_passant_square(value[3])?;
+
+        Ok(Self {
+            state: BoardState {
+                bitboards: bitboards,
+                occupancies: Self::compute_occupancies(bitboards),
+                side_to_move: side_to_move,
+                en_passant_square: en_passant_square,
+                castling_rights: castling_rights,
+            },
+            history: vec![],
+            move_generator: MoveGenerator::new(),
+        })
+    }
+}
+
+impl PartialEq for Board {
+    fn eq(&self, other: &Self) -> bool {
+        println!("{:?}", self.history);
+        println!("{:?}", other.history);
+        (self.state == other.state) && (self.history == other.history)
+    }
+}
+
 impl Board {
     pub fn default() -> Self {
         Self {
@@ -109,28 +145,7 @@ impl Board {
     pub fn from_fen(fen_string: &str) -> Result<Self, ParseFenError> {
         // first block is in regard to piece placement, it start from rank 8 all the way to rank 1
         let fen_parts: Vec<&str> = fen_string.trim().split(' ').collect();
-
-        match fen_parts.len() >= 4 {
-            false => return Err(ParseFenError::BadFenFormat("wrong number of args")),
-            true => {}
-        };
-
-        let bitboards = Self::parse_fen_positions(fen_parts[0])?;
-        let side_to_move = Self::parse_fen_side_to_move(fen_parts[1])?;
-        let castling_rights = Self::parse_fen_castling_rights(fen_parts[2])?;
-        let en_passant_square = Self::parse_fen_en_passant_square(fen_parts[3])?;
-
-        Ok(Self {
-            state: BoardState {
-                bitboards: bitboards,
-                occupancies: Self::compute_occupancies(bitboards),
-                side_to_move: side_to_move,
-                en_passant_square: en_passant_square,
-                castling_rights: castling_rights,
-            },
-            history: vec![],
-            move_generator: MoveGenerator::new(),
-        })
+        Self::try_from(fen_parts)
     }
 
     fn parse_fen_positions(fen_position: &str) -> Result<[[Bitboard; 6]; 2], ParseFenError> {
@@ -253,7 +268,6 @@ impl Board {
             match char {
                 '-' => return Ok(None),
                 'a'..='h' => {
-                    println!("{}", char as u32);
                     file = char as u32 - 97;
                 }
                 '3' | '6' => rank = char.to_digit(10).unwrap() - 1,

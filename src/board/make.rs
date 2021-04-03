@@ -8,6 +8,7 @@ use crate::{
 
 use super::Board;
 
+#[derive(Debug)]
 pub enum MakeMoveError {
     IllegalMove(Move),
     NotACapture,

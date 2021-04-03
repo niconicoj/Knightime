@@ -474,7 +474,6 @@ mod tests {
         ));
         assert_eq!(pawn_moves.get(2), None);
         let pawn_moves = board.generate_quiet_pawn_move(D7, Side::Black);
-        println!("{}", pawn_moves);
         #[rustfmt::skip]
         assert_eq!(
             *pawn_moves.get(0).unwrap(),
@@ -504,7 +503,6 @@ mod tests {
         );
         assert_eq!(pawn_moves.get(2), None);
         let pawn_moves = board.generate_noisy_pawn_move(E2, Side::White);
-        println!("{}", pawn_moves);
         #[rustfmt::skip]
         assert_eq!(
             *pawn_moves.get(0).unwrap(),
@@ -568,7 +566,6 @@ mod tests {
         );
         assert_eq!(pawn_moves.get(4), None);
         let pawn_moves = board.generate_quiet_pawn_move(B7, Side::White);
-        println!("{}", pawn_moves);
         assert_eq!(pawn_moves.get(0), None);
 
         let board =
@@ -658,7 +655,6 @@ mod tests {
         assert!(knight_moves.contains(
             Move::new(E4, F6, Piece::Knight, None, true, false, false, false)
         ));
-        println!("{}", knight_moves);
         assert_eq!(knight_moves.len(), 6);
     }
 

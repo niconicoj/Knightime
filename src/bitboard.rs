@@ -20,7 +20,7 @@ impl fmt::Display for Bitboard {
         for rank in (0u64..8u64).rev() {
             for file in 0u64..8u64 {
                 if file == 0 {
-                    print!("{}   ", rank + 1);
+                    write!(f, "{}   ", rank + 1)?;
                 }
                 let square = (rank * 8 + file) as Square;
                 match self.get_square(square) {

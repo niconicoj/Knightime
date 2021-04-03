@@ -277,7 +277,7 @@ fn found_magic(square: Square, m: Magic, offset: u64, end: u64, attempts: u64) {
     );
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Magic {
     pub mask: Bitboard,
     pub shift: u8,

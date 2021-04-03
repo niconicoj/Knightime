@@ -1,29 +1,23 @@
-use std::time::SystemTime;
-
-use knightime::{board::Board, perft::Perft};
+use knightime::{
+    board::Board, communication::uci::parse_uci_position, constants::*, defs::*,
+    move_generator::movelist::Move,
+};
 
 extern crate knightime;
 
 fn main() {
-    let board = Board::default();
+    let uci_position =
+            "position fen r1bqkbnr/pp1p1ppp/2n1p3/2p5/2BPP3/5N2/PPP2PPP/RNBQK2R b KQkq d3 0 4 moves d7d5 c4b5";
+    let uci_board = parse_uci_position(uci_position).unwrap();
 
-    let mut perft = Perft::new(board);
+    let mut target_board =
+        Board::from_fen("r1bqkbnr/pp1p1ppp/2n1p3/2p5/2BPP3/5N2/PPP2PPP/RNBQK2R b KQkq d3 0 4")
+            .unwrap();
+    let mv = Move::new(D7, D5, Piece::Pawn, None, false, true, false, false);
+    target_board.make_move(mv, false).unwrap();
+    let mv = Move::new(C4, D5, Piece::Bishop, None, false, false, false, false);
+    target_board.make_move(mv, false).unwrap();
 
-    let start = SystemTime::now();
-
-    perft.detailed_run(6, None);
-
-    let duration = start.elapsed();
-
-    match duration {
-        Ok(d) => {
-            println!("time for perft : {}", d.as_millis());
-            println!("nodes : {}", perft.nodes);
-            println!("captures : {}", perft.captures);
-            println!("en passant : {}", perft.en_passants);
-            println!("castling : {}", perft.castles);
-            println!("promotion : {}", perft.promotions);
-        }
-        Err(_) => {}
-    }
+    println!("{}", uci_board);
+    println!("{}", target_board);
 }
