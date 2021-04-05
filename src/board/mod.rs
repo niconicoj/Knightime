@@ -2,6 +2,7 @@ mod attacks;
 mod constants;
 mod defs;
 mod make;
+mod search;
 
 use std::{convert::TryFrom, fmt};
 

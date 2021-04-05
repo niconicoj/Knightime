@@ -476,12 +476,12 @@ mod tests {
         let pawn_moves = board.generate_quiet_pawn_move(D7, Side::Black);
         #[rustfmt::skip]
         assert_eq!(
-            *pawn_moves.get(0).unwrap(),
+            pawn_moves.get(0).unwrap(),
             Move::new(D7, D6, Piece::Pawn, None, false, false, false, false)
         );
         #[rustfmt::skip]
         assert_eq!(
-            *pawn_moves.get(1).unwrap(),
+            pawn_moves.get(1).unwrap(),
             Move::new(D7, D5, Piece::Pawn, None, false, true, false, false)
         );
         assert_eq!(pawn_moves.get(2), None);
@@ -493,48 +493,48 @@ mod tests {
         let pawn_moves = board.generate_noisy_pawn_move(C2, Side::White);
         #[rustfmt::skip]
         assert_eq!(
-            *pawn_moves.get(0).unwrap(),
+            pawn_moves.get(0).unwrap(),
             Move::new(C2, B3, Piece::Pawn, None, true, false, false, false)
         );
         #[rustfmt::skip]
         assert_eq!(
-            *pawn_moves.get(1).unwrap(),
+            pawn_moves.get(1).unwrap(),
             Move::new(C2, D3, Piece::Pawn, None, true, false, false, false)
         );
         assert_eq!(pawn_moves.get(2), None);
         let pawn_moves = board.generate_noisy_pawn_move(E2, Side::White);
         #[rustfmt::skip]
         assert_eq!(
-            *pawn_moves.get(0).unwrap(),
+            pawn_moves.get(0).unwrap(),
             Move::new(E2, D3, Piece::Pawn, None, true, false, false, false)
         );
         assert_eq!(pawn_moves.get(1), None);
         let pawn_moves = board.generate_noisy_pawn_move(G5, Side::White);
         #[rustfmt::skip]
         assert_eq!(
-            *pawn_moves.get(0).unwrap(),
+            pawn_moves.get(0).unwrap(),
             Move::new(G5, H6, Piece::Pawn, None, true, false, true, false)
         );
         assert_eq!(pawn_moves.get(2), None);
         let pawn_moves = board.generate_noisy_pawn_move(F7, Side::White);
         #[rustfmt::skip]
         assert_eq!(
-            *pawn_moves.get(0).unwrap(),
+            pawn_moves.get(0).unwrap(),
             Move::new(F7, G8, Piece::Pawn, Some(Promotion::Queen), true, false, false, false)
         );
         #[rustfmt::skip]
         assert_eq!(
-            *pawn_moves.get(1).unwrap(),
+            pawn_moves.get(1).unwrap(),
             Move::new(F7, G8, Piece::Pawn, Some(Promotion::Rook), true, false, false, false)
         );
         #[rustfmt::skip]
         assert_eq!(
-            *pawn_moves.get(2).unwrap(),
+            pawn_moves.get(2).unwrap(),
             Move::new(F7, G8, Piece::Pawn, Some(Promotion::Bishop), true, false, false, false)
         );
         #[rustfmt::skip]
         assert_eq!(
-            *pawn_moves.get(3).unwrap(),
+            pawn_moves.get(3).unwrap(),
             Move::new(F7, G8, Piece::Pawn, Some(Promotion::Knight), true, false, false, false)
         );
         assert_eq!(pawn_moves.get(4), None);
@@ -546,22 +546,22 @@ mod tests {
         let pawn_moves = board.generate_quiet_pawn_move(E7, Side::White);
         #[rustfmt::skip]
         assert_eq!(
-            *pawn_moves.get(0).unwrap(),
+            pawn_moves.get(0).unwrap(),
             Move::new(E7, E8, Piece::Pawn, Some(Promotion::Queen), false, false, false, false)
         );
         #[rustfmt::skip]
         assert_eq!(
-            *pawn_moves.get(1).unwrap(),
+            pawn_moves.get(1).unwrap(),
             Move::new(E7, E8, Piece::Pawn, Some(Promotion::Rook), false, false, false, false)
         );
         #[rustfmt::skip]
         assert_eq!(
-            *pawn_moves.get(2).unwrap(),
+            pawn_moves.get(2).unwrap(),
             Move::new(E7, E8, Piece::Pawn, Some(Promotion::Bishop), false, false, false, false)
         );
         #[rustfmt::skip]
         assert_eq!(
-            *pawn_moves.get(3).unwrap(),
+            pawn_moves.get(3).unwrap(),
             Move::new(E7, E8, Piece::Pawn, Some(Promotion::Knight), false, false, false, false)
         );
         assert_eq!(pawn_moves.get(4), None);
@@ -595,7 +595,7 @@ mod tests {
         let castling_moves = board.generate_castling_moves(Side::Black);
         #[rustfmt::skip]
         assert_eq!(
-            *castling_moves.get(0).unwrap(),
+            castling_moves.get(0).unwrap(),
             Move::new(E8, G8, Piece::King, None, false, false, false, true)
         );
         assert_eq!(castling_moves.get(1), None);
@@ -606,12 +606,12 @@ mod tests {
         let castling_moves = board.generate_castling_moves(Side::White);
         #[rustfmt::skip]
         assert_eq!(
-            *castling_moves.get(0).unwrap(),
+            castling_moves.get(0).unwrap(),
             Move::new(E1, G1, Piece::King, None, false, false, false, true)
         );
         #[rustfmt::skip]
         assert_eq!(
-            *castling_moves.get(1).unwrap(),
+            castling_moves.get(1).unwrap(),
             Move::new(E1, C1, Piece::King, None, false, false, false, true)
         );
         assert_eq!(castling_moves.get(2), None);

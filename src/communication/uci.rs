@@ -113,11 +113,56 @@ pub fn parse_uci_position(uci_string: &str) -> Result<Board, UciError> {
     Ok(board)
 }
 
+pub fn parse_uci_go(uci_string: &str, board: &Board) -> Result<Move, UciError> {
+    enum Tokens {
+        Nothing,
+        Depth,
+    }
+
+    let parts: Vec<String> = uci_string
+        .split_whitespace()
+        .map(|s| s.to_string())
+        .collect();
+
+    let mut depth: Option<u32> = None;
+    let mut token = Tokens::Nothing;
+
+    for p in parts {
+        match p {
+            t if t == "depth" => token = Tokens::Depth,
+            _ => match token {
+                Tokens::Depth => {
+                    depth = match p.parse::<u32>() {
+                        Ok(d) => Some(d),
+                        Err(_) => return Err(UciError::BadGoFormat),
+                    };
+                }
+
+                Tokens::Nothing => (),
+            },
+        }
+    }
+
+    match depth {
+        Some(d) => {
+            let mv = board.search(d);
+            match mv {
+                Some(m) => return Ok(m),
+                None => return Err(UciError::NoAvailableMove),
+            }
+        }
+        None => {}
+    }
+    Err(UciError::BadGoFormat)
+}
+
 #[derive(Debug, PartialEq)]
 pub enum UciError {
     BadMoveFormat,
+    BadGoFormat,
     BadPositionFormat,
     IllegalMove,
+    NoAvailableMove,
 }
 
 #[cfg(test)]

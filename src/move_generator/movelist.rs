@@ -31,8 +31,13 @@ impl MoveList {
         Self(vec![])
     }
 
-    pub fn get(&self, index: usize) -> Option<&Move> {
-        self.0.get(index)
+    pub fn get(&self, index: usize) -> Option<Move> {
+        let el = self.0.get(index);
+
+        match el {
+            Some(e) => return Some(e.clone()),
+            None => return None,
+        }
     }
 
     pub fn add_move(&mut self, mv: Move) {
